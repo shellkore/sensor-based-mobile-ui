@@ -89,7 +89,7 @@ The package is configured as `sensor-based-mobile-ui` at version `0.1.0`. Publis
    ```
 
 3. Check whether the name is available at [npmjs.com/package/sensor-based-mobile-ui](https://www.npmjs.com/package/sensor-based-mobile-ui). If it is taken, change `name` in `package.json` and update the import examples. For a package under your npm account scope, use `@YOUR_NPM_USERNAME/sensor-based-mobile-ui` and publish with `npm publish --access public`.
-4. Choose a license before distributing the library. Until then, `package.json` says `UNLICENSED` and the repository does not grant an open-source license. Review the code and README you intend to release, then check the tests and package contents:
+4. Review the code and README you intend to release, then check the tests and package contents:
 
    ```bash
    npm test
@@ -107,3 +107,7 @@ After publishing, install it with `npm install sensor-based-mobile-ui react` and
 ## Contributing
 
 Issues and contributions are welcome. As sensor interactions and UI designs are decided, this README will document supported devices, setup, usage, and contribution checks.
+
+## License
+
+This project is licensed under the [MIT License](LICENSE).

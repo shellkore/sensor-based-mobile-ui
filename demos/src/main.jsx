@@ -3,8 +3,16 @@ import { createRoot } from 'react-dom/client';
 import { ScaredUI, MagneticUI } from '../../src/react/index.js';
 import './style.css';
 
+function scrollToExperiments(event) {
+  const section = document.getElementById('experiments');
+  if (section) {
+    event.preventDefault();
+    section.scrollIntoView();
+  }
+}
+
 function Header() {
-  return <header className="header"><a className="brand" href="/" aria-label="Sensor UI Lab home"><span className="brand-icon">✳</span><span>SENSOR<span className="brand-accent">/</span>UI<small>INTERACTION LAB</small></span></a><nav aria-label="Main navigation"><a href="/#experiments">Experiments</a><a className="nav-link" href="/scared">Enter the lab <span>↗</span></a></nav></header>;
+  return <header className="header"><a className="brand" href="/" aria-label="Sensor UI Lab home"><span className="brand-icon">✳</span><span>SENSOR<span className="brand-accent">/</span>UI<small>INTERACTION LAB</small></span></a><nav aria-label="Main navigation"><a href="/#experiments" onClick={scrollToExperiments}>Experiments</a><a className="nav-link" href="/#experiments" onClick={scrollToExperiments}>Enter the lab <span>↗</span></a></nav></header>;
 }
 
 function Footer() {
@@ -12,7 +20,14 @@ function Footer() {
 }
 
 function Home() {
-  return <><main><section className="hero"><div className="hero-copy"><div className="eyebrow"><span className="pulse" /> A NEW KIND OF INTERFACE <span className="eyebrow-index">/ 001</span></div><h1>Interfaces<br />that <em>feel.</em></h1><p>What if your screen could sense the world around it? Explore a collection of interfaces that respond to you, in real time.</p><a className="button button-primary" href="#experiments">Explore experiments <span>↘</span></a><div className="hero-caption"><span>✳</span> A LITTLE LESS STATIC.<br />&nbsp;&nbsp;&nbsp;&nbsp; A LOT MORE ALIVE.</div></div><div className="hero-art" aria-hidden="true"><div className="art-label art-label-top">SENSOR INPUT <span>● ACTIVE</span></div><div className="orbit orbit-one" /><div className="orbit orbit-two" /><div className="orb"><div className="orb-core">✳</div></div><div className="art-cross cross-one">+</div><div className="art-cross cross-two">+</div><div className="art-label art-label-bottom"><span>RESPONSIVE BY NATURE</span><span>02 / 02</span></div></div></section>
+  React.useEffect(() => {
+    if (window.location.hash === '#experiments') {
+      window.history.replaceState(window.history.state, '', window.location.pathname + window.location.search);
+      document.getElementById('experiments')?.scrollIntoView();
+    }
+  }, []);
+
+  return <><main><section className="hero"><div className="hero-copy"><div className="eyebrow"><span className="pulse" /> A NEW KIND OF INTERFACE <span className="eyebrow-index">/ 001</span></div><h1>Interfaces<br />that <em>feel.</em></h1><p>What if your screen could sense the world around it? Explore a collection of interfaces that respond to you, in real time.</p><a className="button button-primary" href="#experiments" onClick={scrollToExperiments}>Explore experiments <span>↘</span></a><div className="hero-caption"><span>✳</span> A LITTLE LESS STATIC.<br />&nbsp;&nbsp;&nbsp;&nbsp; A LOT MORE ALIVE.</div></div><div className="hero-art" aria-hidden="true"><div className="art-label art-label-top">SENSOR INPUT <span>● ACTIVE</span></div><div className="orbit orbit-one" /><div className="orbit orbit-two" /><div className="orb"><div className="orb-core">✳</div></div><div className="art-cross cross-one">+</div><div className="art-cross cross-two">+</div><div className="art-label art-label-bottom"><span>RESPONSIVE BY NATURE</span><span>02 / 02</span></div></div></section>
     <section className="gallery" id="experiments"><div className="section-head"><div><div className="eyebrow"><span className="dash" /> THE COLLECTION</div><h2>Pick your <em>experience.</em></h2></div><p>A growing collection of small experiments in human-device interaction.</p></div><a className="experiment-card" href="/scared"><div className="card-visual" aria-hidden="true"><div className="card-grid" /><div className="card-orb">✳</div><span className="visual-index">EXPERIMENT / 001</span><span className="visual-symbol">↗</span></div><div className="card-content"><div className="card-meta"><span>01 / AMBIENT LIGHT</span><span className="available"><span /> AVAILABLE NOW</span></div><h3>scaredUI<span>↗</span></h3><p>An interface that gets the jitters when you get a little too close.</p><div className="card-footer"><span>LIGHT-RESPONSIVE</span><span>EXPLORE EXPERIENCE &nbsp; →</span></div></div></a><a className="experiment-card magnetic-card" href="/magnetic"><div className="card-visual" aria-hidden="true"><div className="card-grid" /><div className="card-orb">◎</div><span className="visual-index">EXPERIMENT / 002</span><span className="visual-symbol">↗</span></div><div className="card-content"><div className="card-meta"><span>02 / MAGNETOMETER</span><span className="available"><span /> AVAILABLE NOW</span></div><h3>magneticUI<span>↗</span></h3><p>An interface that moves with the magnetic field around your device.</p><div className="card-footer"><span>MAGNETIC-FIELD RESPONSIVE</span><span>EXPLORE EXPERIENCE &nbsp; →</span></div></div></a><div className="collection-end"><span>MORE EXPERIMENTS IN THE MAKING</span><span>✳</span></div></section></main></>;
 }
 
