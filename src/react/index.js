@@ -178,7 +178,7 @@ export function ScaredUI({ children, className }) {
   );
 }
 
-export function MagneticUI({ children, className }) {
+export function CompassUI({ children, className }) {
   const [status, setStatus] = useState('idle');
   const [session, setSession] = useState(0);
   const [source, setSource] = useState(null);
@@ -271,9 +271,9 @@ export function MagneticUI({ children, className }) {
   }, [session, source]);
 
   return React.createElement('div', { className },
-    React.createElement('button', { type: 'button', onClick: enable, disabled: status === 'permission' }, session ? 'Recalibrate magneticUI' : 'Enable magneticUI'),
+    React.createElement('button', { type: 'button', onClick: enable, disabled: status === 'permission' }, session ? 'Recalibrate compassUI' : 'Enable compassUI'),
     React.createElement('p', { role: 'status' }, {
-      idle: 'Hold your device still, then enable magneticUI.',
+      idle: 'Hold your device still, then enable compassUI.',
       permission: 'Waiting for motion and orientation permission.',
       starting: 'Keep your device still while calibrating.',
       active: 'Move or rotate your device to change the magnetic field.',
@@ -289,3 +289,5 @@ export function MagneticUI({ children, className }) {
     }, child))
   );
 }
+
+export { CompassUI as MagneticUI };

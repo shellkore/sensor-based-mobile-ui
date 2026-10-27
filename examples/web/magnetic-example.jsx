@@ -1,11 +1,11 @@
 import React from 'react';
-import { MagneticUI } from 'sensor-based-mobile-ui';
+import { CompassUI } from 'sensor-based-mobile-ui';
 
-export default function MagneticExample() {
+export default function CompassExample() {
   return (
-    <MagneticUI>
+    <CompassUI>
       <button>Explore</button>
       <button>Discover</button>
-    </MagneticUI>
+    </CompassUI>
   );
 }

@@ -4,7 +4,7 @@ A UI library in development for building interfaces that respond to mobile devic
 
 ## Project status
 
-`ScaredUI` and `MagneticUI` are available for React and Next.js. React Native support is planned. The package is not published yet.
+`ScaredUI` and `CompassUI` are available for React and Next.js. React Native support is planned. The package is not published yet.
 
 ### scaredUI
 
@@ -29,24 +29,24 @@ Safari and Chrome on iPhone do not currently expose the ambient light sensor thr
 
 Each direct child gets an inline-block wrapper, so its layout may differ from an unwrapped child. Use direct children for elements that should move independently.
 
-### magneticUI
+### compassUI
 
-`MagneticUI` moves its direct children in response to changes in the device's magnetic field. Hold the device still while enabling it: the first valid reading is the baseline. Rotate or move the device to change the reading, and recalibrate to set a new baseline.
+`CompassUI` moves its direct children in response to changes in the device's magnetic field or compass heading. Hold the device still while enabling it: the first valid reading is the baseline. Rotate or move the device to change the reading, and recalibrate to set a new baseline.
 
 ```jsx
-import { MagneticUI } from 'sensor-based-mobile-ui';
+import { CompassUI } from 'sensor-based-mobile-ui';
 
 export default function Example() {
   return (
-    <MagneticUI>
+    <CompassUI>
       <button>Explore</button>
       <button>Discover</button>
-    </MagneticUI>
+    </CompassUI>
   );
 }
 ```
 
-Magnetic sensing requires a secure context (HTTPS or localhost), compatible hardware, and permission. Where the browser exposes `Magnetometer`, the effect uses changes in its x and y field readings. On iPhone, browsers can instead use the compass heading from device orientation events; tap Enable and allow motion and orientation access when prompted. Rotate the phone to see the effect. The compass fallback responds to heading changes, not field strength, and neither method locates a magnet. Support varies, and browser settings or embedding policies can block access. If access is unavailable or denied, the children remain usable and a message is displayed. Motion is limited and disabled when the user prefers reduced motion. As with `ScaredUI`, each direct child receives an inline-block wrapper. React 18 or newer is required; in Next.js, use a client component.
+`MagneticUI` remains available as an alias for existing users. Magnetic sensing requires a secure context (HTTPS or localhost), compatible hardware, and permission. Where the browser exposes `Magnetometer`, the effect uses changes in its x and y field readings. On iPhone, browsers can instead use the compass heading from device orientation events; tap Enable and allow motion and orientation access when prompted. Rotate the phone to see the effect. The compass fallback responds to heading changes, not field strength, and neither method locates a magnet. Support varies, and browser settings or embedding policies can block access. If access is unavailable or denied, the children remain usable and a message is displayed. Motion is limited and disabled when the user prefers reduced motion. As with `ScaredUI`, each direct child receives an inline-block wrapper. React 18 or newer is required; in Next.js, use a client component.
 
 ## Planned structure
 

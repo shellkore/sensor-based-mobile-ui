@@ -18,8 +18,8 @@ export function readMagneticHeading(state, heading) {
 
 export function magneticMotion(state) {
   if (!state.baseline) return { x: 0, y: 0 };
-  const x = (state.field.x - state.baseline.x) * 0.8;
-  const y = (state.field.y - state.baseline.y) * 0.8;
-  const scale = Math.min(1, 24 / (Math.hypot(x, y) || 1));
+  const x = (state.field.x - state.baseline.x) * 1.6;
+  const y = (state.field.y - state.baseline.y) * 1.6;
+  const scale = Math.min(1, 48 / (Math.hypot(x, y) || 1));
   return { x: x * scale, y: y ? -y * scale : 0 };
 }

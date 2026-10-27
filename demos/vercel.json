@@ -1,6 +1,7 @@
 {
   "rewrites": [
     { "source": "/scared", "destination": "/index.html" },
-    { "source": "/magnetic", "destination": "/index.html" }
+    { "source": "/magnetic", "destination": "/index.html" },
+    { "source": "/compass", "destination": "/index.html" }
   ]
 }
