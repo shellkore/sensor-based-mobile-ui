@@ -8,7 +8,7 @@ A UI library in development for building interfaces that respond to mobile devic
 
 ### scaredUI
 
-`ScaredUI` wraps each direct child and moves it when a shadow falls on the device's ambient light sensor. A faster drop in light produces a stronger shake and temporary displacement. The first reading after enabling or recalibrating is the baseline, so keep the sensor uncovered until calibration finishes.
+`ScaredUI` wraps each direct child and moves it when a shadow falls on the device's ambient light sensor. When the sensor is unavailable, users can opt in to a front-camera fallback that estimates changes in brightness. A faster drop in light produces a stronger shake and temporary displacement. The first reading after enabling or recalibrating is the baseline, so keep the sensor or camera uncovered until calibration finishes.
 
 ```jsx
 import { ScaredUI } from 'sensor-based-mobile-ui';
@@ -23,7 +23,9 @@ export default function Example() {
 }
 ```
 
-React 18 or newer is a peer dependency. For Next.js, use this component from a client component. The browser must expose `AmbientLightSensor` in a secure context (HTTPS or localhost), and the device must have a usable sensor. Browser support is limited, and permissions or embedding policies can block access. Unsupported or denied access leaves the children usable and displays a message. The sensor measures light, not distance: lighting changes and shadows can also trigger the effect. Recalibrate when the surrounding light changes. Motion is disabled when the user prefers reduced motion.
+React 18 or newer is a peer dependency. For Next.js, use this component from a client component. Sensor and camera access require a secure context (HTTPS or localhost), compatible hardware, and permission. Unsupported or denied access leaves the children usable and displays a message. Neither method measures distance: lighting changes and shadows can also trigger the effect. Recalibrate when the surrounding light changes. Motion is disabled when the user prefers reduced motion.
+
+Safari and Chrome on iPhone do not currently expose the ambient light sensor through this API, so users can choose the camera fallback. It requests the front camera without audio and processes small frames locally; video is not saved or sent anywhere. The camera stops when the user selects Stop camera, leaves the page, or switches away from the tab. Cover enough of the front camera's view to darken it. Automatic exposure and changes in the scene can affect the response. Some Chromium browsers expose the sensor only behind an experimental flag.
 
 Each direct child gets an inline-block wrapper, so its layout may differ from an unwrapped child. Use direct children for elements that should move independently.
 

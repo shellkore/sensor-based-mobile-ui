@@ -2,6 +2,14 @@ export function createScaredState() {
   return { baseline: null, light: null, time: null, impulse: 0 };
 }
 
+export function frameBrightness(pixels) {
+  let total = 0;
+  for (let i = 0; i < pixels.length; i += 4) {
+    total += pixels[i] * 0.2126 + pixels[i + 1] * 0.7152 + pixels[i + 2] * 0.0722;
+  }
+  return pixels.length ? total / (pixels.length / 4) : 0;
+}
+
 export function readLight(state, light, time) {
   if (!Number.isFinite(light) || light < 0 || !Number.isFinite(time)) return state;
   // shortcut: the first reading is the baseline; use sampled calibration if hardware readings are noisy.

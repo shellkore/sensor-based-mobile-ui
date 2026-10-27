@@ -1,6 +1,15 @@
 import { test } from 'node:test';
 import { strict as assert } from 'node:assert';
-import { createScaredState, readLight, scaredMotion } from './scared.js';
+import { createScaredState, frameBrightness, readLight, scaredMotion } from './scared.js';
+
+test('camera brightness drops when its view is covered', () => {
+  const bright = frameBrightness(new Uint8ClampedArray([200, 200, 200, 255, 100, 100, 100, 255]));
+  const dark = frameBrightness(new Uint8ClampedArray([20, 20, 20, 255, 10, 10, 10, 255]));
+  assert.ok(Math.abs(bright - 150) < 0.001);
+  assert.ok(dark < bright);
+  assert.ok(readLight(readLight(createScaredState(), bright, 1000), dark, 1100).impulse > 0);
+  assert.equal(frameBrightness([]), 0);
+});
 
 test('calibrates, responds more to a fast shadow, and settles after light returns', () => {
   const initial = readLight(createScaredState(), 100, 1000);
