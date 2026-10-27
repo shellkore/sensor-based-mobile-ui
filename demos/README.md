@@ -12,7 +12,7 @@ npm install
 npm run dev
 ```
 
-Open the local URL Vite prints. Ambient light and magnetometer access require a supported browser and device in a secure context. `localhost` works for local testing on the same device; use the HTTPS deployment to test on a phone. Keep the light sensor uncovered while enabling or recalibrating scaredUI, and hold the device still while calibrating magneticUI. Browsers without sensor access display a message and keep the content usable.
+Open the local URL Vite prints. Sensor access requires a supported browser and device in a secure context. `localhost` works for local testing on the same device; use the HTTPS deployment to test on a phone. Keep the light sensor uncovered while enabling or recalibrating scaredUI, and hold the device still while calibrating magneticUI. On iPhone, magneticUI can use compass heading and asks for motion and orientation access when enabled. Browsers without sensor access display a message and keep the content usable.
 
 The ambient light API used by scaredUI is not available in Safari or Chrome on iPhone. When the sensor is unavailable, choose **Use front camera**, allow camera access, and keep the camera uncovered while it calibrates. Move your hand over the camera's view to try the effect. Frames are processed locally and are not saved or sent; use **Stop camera** to stop capture. Camera exposure or scene changes may affect the response. Some Chromium browsers require an experimental flag and compatible hardware for sensor access.
 

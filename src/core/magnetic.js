@@ -9,6 +9,13 @@ export function readMagneticField(state, x, y) {
   return { baseline: state.baseline ?? field, field };
 }
 
+export function readMagneticHeading(state, heading) {
+  if (!Number.isFinite(heading) || heading < 0 || heading >= 360) return state;
+  const radians = heading * Math.PI / 180;
+  // shortcut: compass heading has no field strength; use raw magnetometer readings when available.
+  return readMagneticField(state, 30 * Math.cos(radians), 30 * Math.sin(radians));
+}
+
 export function magneticMotion(state) {
   if (!state.baseline) return { x: 0, y: 0 };
   const x = (state.field.x - state.baseline.x) * 0.8;

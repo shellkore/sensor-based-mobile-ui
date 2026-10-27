@@ -46,7 +46,7 @@ export default function Example() {
 }
 ```
 
-The browser must expose `Magnetometer` in a secure context (HTTPS or localhost), with a usable sensor and permission to access it. Support is limited and embedding policies can block access. Unsupported or denied access leaves the children usable and displays a message. The effect uses changes in the sensor's x and y field readings, including changes caused by device rotation or nearby magnetic objects; it does not locate a magnet. Motion is limited and disabled when the user prefers reduced motion. As with `ScaredUI`, each direct child receives an inline-block wrapper. React 18 or newer is required; in Next.js, use a client component.
+Magnetic sensing requires a secure context (HTTPS or localhost), compatible hardware, and permission. Where the browser exposes `Magnetometer`, the effect uses changes in its x and y field readings. On iPhone, browsers can instead use the compass heading from device orientation events; tap Enable and allow motion and orientation access when prompted. Rotate the phone to see the effect. The compass fallback responds to heading changes, not field strength, and neither method locates a magnet. Support varies, and browser settings or embedding policies can block access. If access is unavailable or denied, the children remain usable and a message is displayed. Motion is limited and disabled when the user prefers reduced motion. As with `ScaredUI`, each direct child receives an inline-block wrapper. React 18 or newer is required; in Next.js, use a client component.
 
 ## Planned structure
 

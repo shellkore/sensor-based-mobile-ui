@@ -2,7 +2,7 @@
 
 import React, { useEffect, useRef, useState } from 'react';
 import { createScaredState, frameBrightness, readLight, scaredMotion } from '../core/scared.js';
-import { createMagneticState, readMagneticField, magneticMotion } from '../core/magnetic.js';
+import { createMagneticState, readMagneticField, readMagneticHeading, magneticMotion } from '../core/magnetic.js';
 
 export function ScaredUI({ children, className }) {
   const [status, setStatus] = useState('idle');
@@ -181,18 +181,46 @@ export function ScaredUI({ children, className }) {
 export function MagneticUI({ children, className }) {
   const [status, setStatus] = useState('idle');
   const [session, setSession] = useState(0);
+  const [source, setSource] = useState(null);
   const elements = useRef([]);
+  const request = useRef(0);
 
-  useEffect(() => {
-    if (!session) return;
-    if (!window.isSecureContext || !('Magnetometer' in window)) {
-      setStatus('unavailable');
+  useEffect(() => () => { request.current++; }, []);
+
+  const enable = async () => {
+    const current = ++request.current;
+    if (!window.isSecureContext) { setStatus('insecure'); return; }
+    if ('Magnetometer' in window) {
+      setSource('magnetometer');
+    } else if (window.DeviceOrientationEvent) {
+      setStatus('permission');
+      try {
+        if (typeof window.DeviceOrientationEvent.requestPermission === 'function' &&
+            await window.DeviceOrientationEvent.requestPermission(true) !== 'granted') {
+          if (current === request.current) setStatus('denied');
+          return;
+        }
+      } catch {
+        if (current === request.current) setStatus('denied');
+        return;
+      }
+      if (current !== request.current) return;
+      setSource('compass');
+    } else {
+      setStatus('unsupported');
       return;
     }
+    setStatus('starting');
+    setSession(value => value + 1);
+  };
+
+  useEffect(() => {
+    if (!session || !source) return;
 
     let sensor;
     let frame;
     let state = createMagneticState();
+    let timeout = setTimeout(() => setStatus('unavailable'), 8000);
     const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
     const reset = () => elements.current.forEach(element => {
       if (element) element.style.transform = '';
@@ -204,39 +232,56 @@ export function MagneticUI({ children, className }) {
       });
       frame = requestAnimationFrame(animate);
     };
+    const onOrientation = event => {
+      state = readMagneticHeading(state, event.webkitCompassHeading);
+      if (state.baseline) { clearTimeout(timeout); setStatus('compass-active'); }
+    };
     try {
-      sensor = new window.Magnetometer({ frequency: 10 });
-      sensor.addEventListener('reading', () => {
-        state = readMagneticField(state, sensor.x, sensor.y);
-        if (state.baseline) setStatus('active');
-      });
-      sensor.addEventListener('error', () => {
-        sensor.stop();
-        cancelAnimationFrame(frame);
-        reset();
-        setStatus('unavailable');
-      });
-      sensor.start();
+      if (source === 'compass') {
+        window.addEventListener('deviceorientation', onOrientation);
+      } else {
+        sensor = new window.Magnetometer({ frequency: 10 });
+        sensor.addEventListener('reading', () => {
+          state = readMagneticField(state, sensor.x, sensor.y);
+          if (state.baseline) { clearTimeout(timeout); setStatus('active'); }
+        });
+        sensor.addEventListener('error', () => {
+          sensor.stop();
+          clearTimeout(timeout);
+          cancelAnimationFrame(frame);
+          reset();
+          setStatus('unavailable');
+        });
+        sensor.start();
+      }
       frame = requestAnimationFrame(animate);
     } catch {
       sensor?.stop();
+      clearTimeout(timeout);
       reset();
       setStatus('unavailable');
     }
     return () => {
       sensor?.stop();
+      window.removeEventListener('deviceorientation', onOrientation);
+      clearTimeout(timeout);
       cancelAnimationFrame(frame);
       reset();
     };
-  }, [session]);
+  }, [session, source]);
 
   return React.createElement('div', { className },
-    React.createElement('button', { type: 'button', onClick: () => { setStatus('starting'); setSession(value => value + 1); } }, session ? 'Recalibrate magneticUI' : 'Enable magneticUI'),
+    React.createElement('button', { type: 'button', onClick: enable, disabled: status === 'permission' }, session ? 'Recalibrate magneticUI' : 'Enable magneticUI'),
     React.createElement('p', { role: 'status' }, {
       idle: 'Hold your device still, then enable magneticUI.',
+      permission: 'Waiting for motion and orientation permission.',
       starting: 'Keep your device still while calibrating.',
       active: 'Move or rotate your device to change the magnetic field.',
-      unavailable: 'Magnetic field sensing is unavailable or permission was denied.'
+      'compass-active': 'Rotate your device to change its compass heading.',
+      insecure: 'Magnetic sensing requires HTTPS or localhost.',
+      unsupported: 'This browser does not provide magnetic sensing or a compass heading.',
+      denied: 'Motion and orientation access was denied. Check your browser settings and try again.',
+      unavailable: 'No magnetic reading was received. Check your device and browser settings, then try again.'
     }[status]),
     React.Children.map(children, (child, index) => React.createElement('div', {
       ref: element => { elements.current[index] = element; },
