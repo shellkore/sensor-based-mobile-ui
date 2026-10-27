@@ -1,6 +1,6 @@
 # Sensor UI demos
 
-This React/Vite app is the home for the project's web demos. Its first demo uses the real `ScaredUI` component from `../src`.
+This React/Vite app lists the project's web demos on `/`. The `/scared` demo uses the real `ScaredUI` component from `../src`.
 
 ## Run locally
 
@@ -16,4 +16,4 @@ Open the local URL Vite prints. Ambient light access requires a supported browse
 
 ## Deploy to Vercel
 
-Connect the repository and set **Root Directory** to `demos`. Choose the Vite framework preset if it is not detected; the build command is `npm run build` and the output directory is `dist`. In the Root Directory settings, ensure **Include source files outside of the Root Directory in the Build Step** is enabled: this app imports the shared component from `src` in the repository root. Commit both `demos` and `src` before deploying. No environment variables are required.
+Connect the repository and set **Root Directory** to `demos`. Choose the Vite framework preset if it is not detected; the build command is `npm run build` and the output directory is `dist`. In the Root Directory settings, ensure **Include source files outside of the Root Directory in the Build Step** is enabled: this app imports the shared component from `src` in the repository root. The included `vercel.json` lets direct visits to `/scared` load the app. Commit both `demos` and `src` before deploying. No environment variables are required.
