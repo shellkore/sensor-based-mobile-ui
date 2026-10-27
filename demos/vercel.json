@@ -1,9 +1,9 @@
 {
   "rewrites": [
-    { "source": "/scared", "destination": "/index.html" },
-    { "source": "/magnetic", "destination": "/index.html" },
-    { "source": "/compass", "destination": "/index.html" },
-    { "source": "/tornado", "destination": "/index.html" },
-    { "source": "/earthquake", "destination": "/index.html" }
+    { "source": "/scared", "destination": "/seo/scared.html" },
+    { "source": "/compass", "destination": "/seo/compass.html" },
+    { "source": "/tornado", "destination": "/seo/tornado.html" },
+    { "source": "/earthquake", "destination": "/seo/earthquake.html" },
+    { "source": "/docs", "destination": "/seo/docs.html" }
   ]
 }

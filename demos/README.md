@@ -1,6 +1,6 @@
 # Sensor UI demos
 
-This React/Vite app lists the project's web demos on `/`. The `/scared`, `/compass`, `/tornado`, and `/earthquake` demos use the real `ScaredUI`, `CompassUI`, `TornadoUI`, and `EarthquakeUI` components from `../src`.
+This React/Vite app lists the project's web demos on `/` and provides usage guidance at `/docs`. The `/scared`, `/compass`, `/tornado`, and `/earthquake` demos use the real `ScaredUI`, `CompassUI`, `TornadoUI`, and `EarthquakeUI` components from `../src`.
 
 ## Run locally
 
@@ -22,4 +22,6 @@ The ambient light API used by scaredUI is not available in Safari or Chrome on i
 
 ## Deploy to Vercel
 
-Connect the repository and set **Root Directory** to `demos`. Choose the Vite framework preset if it is not detected; the build command is `npm run build` and the output directory is `dist`. In the Root Directory settings, ensure **Include source files outside of the Root Directory in the Build Step** is enabled: this app imports the shared components from `src` in the repository root. The included `vercel.json` lets direct visits to `/scared`, `/compass`, `/tornado`, `/earthquake`, and the previous `/magnetic` link load the app. Commit both `demos` and `src` before deploying. No environment variables are required.
+Connect the repository and set **Root Directory** to `demos`. Choose the Vite framework preset if it is not detected; the build command is `npm run build` and the output directory is `dist`. In the Root Directory settings, ensure **Include source files outside of the Root Directory in the Build Step** is enabled: this app imports the shared components from `src` in the repository root. The included `vercel.json` serves route-specific HTML metadata for `/scared`, `/compass`, `/tornado`, `/earthquake`, and `/docs`. Commit both `demos` and `src` before deploying.
+
+Canonical and social-preview URLs use `SITE_URL` if set, Vercel's `VERCEL_PROJECT_PRODUCTION_URL` otherwise, or `https://sensor-based-mobile-ui.vercel.app` as a fallback. Set `SITE_URL` to the preferred public origin if using a custom domain.
