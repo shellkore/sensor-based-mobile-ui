@@ -335,10 +335,17 @@ export function TornadoUI({ children, className }) {
       setStatus('active');
     };
     const animate = () => {
-      elements.current.forEach((element, index) => {
+      const items = elements.current.filter(Boolean);
+      const left = Math.min(...items.map(element => element.offsetLeft));
+      const right = Math.max(...items.map(element => element.offsetLeft + element.offsetWidth));
+      const top = Math.min(...items.map(element => element.offsetTop));
+      const bottom = Math.max(...items.map(element => element.offsetTop + element.offsetHeight));
+      const centerX = (left + right) / 2;
+      const centerY = (top + bottom) / 2;
+      items.forEach(element => {
         if (!element) return;
-        const { x, y, rotate } = reducedMotion.matches ? { x: 0, y: 0, rotate: 0 } : tornadoMotion(state, Date.now(), index);
-        element.style.transform = `translate(${x}px, ${y}px) rotate(${rotate}deg)`;
+        const { x, y } = reducedMotion.matches ? { x: 0, y: 0 } : tornadoMotion(state, Date.now(), element.offsetLeft + element.offsetWidth / 2 - centerX, element.offsetTop + element.offsetHeight / 2 - centerY);
+        element.style.transform = `translate(${x}px, ${y}px)`;
       });
       frame = requestAnimationFrame(animate);
     };
@@ -352,7 +359,7 @@ export function TornadoUI({ children, className }) {
     };
   }, [session]);
 
-  return React.createElement('div', { className },
+  return React.createElement('div', { className, style: { position: 'relative' } },
     React.createElement('button', { type: 'button', disabled: status === 'permission' || status === 'active' || status === 'starting', onClick: enable }, status === 'active' ? 'TornadoUI enabled' : session ? 'Try tornadoUI again' : 'Enable tornadoUI'),
     React.createElement('p', { role: 'status' }, {
       idle: 'Enable tornadoUI, then rotate your device quickly.',

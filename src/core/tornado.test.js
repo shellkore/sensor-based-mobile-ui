@@ -11,7 +11,15 @@ test('rotation drives bounded motion that settles after readings stop', () => {
   assert.equal(fast.intensity, 1);
   const settling = readRotation({ alpha: 0 }, 1700, fast);
   assert.ok(settling.intensity > 0 && settling.intensity < 1);
-  assert.ok(Math.hypot(...Object.values(tornadoMotion(fast, 1000, 0)).slice(0, 2)) > 20);
-  assert.ok(Math.abs(tornadoMotion(fast, 10000, 0).x) < 0.001);
-  assert.notDeepEqual(tornadoMotion(fast, 1000, 0), tornadoMotion(fast, 1000, 1));
+  assert.ok(Math.abs(tornadoMotion(fast, 10000, 100, 0).x) < 0.001);
+});
+
+test('components orbit a shared center in a circle', () => {
+  const state = { intensity: 1, time: 0 };
+  const atStart = tornadoMotion(state, 0, 100, 0);
+  const quarter = tornadoMotion({ ...state, time: Math.PI * 200 }, Math.PI * 200, 100, 0);
+  assert.ok(Math.abs(atStart.x - 40) < 0.001 && Math.abs(atStart.y) < 0.001);
+  assert.ok(Math.abs(quarter.x + 100) < 0.001 && Math.abs(quarter.y - 140) < 0.001);
+  const other = tornadoMotion({ ...state, time: Math.PI * 200 }, Math.PI * 200, -100, 0);
+  assert.ok(Math.abs(other.x - 100) < 0.001 && Math.abs(other.y + 60) < 0.001);
 });

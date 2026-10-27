@@ -5,8 +5,10 @@ export function readRotation(rate, time, previous = null) {
   return { intensity: Math.max(remaining, Math.min(1, Math.max(0, (speed - 30) / 150))), time };
 }
 
-export function tornadoMotion(state, time, index) {
+export function tornadoMotion(state, time, x, y) {
   const intensity = state ? state.intensity * Math.exp(-Math.max(0, time - state.time) / 700) : 0;
-  const phase = time / 180 + index * 2.4;
-  return { x: Math.cos(phase) * 35 * intensity, y: Math.sin(phase) * 22 * intensity, rotate: Math.sin(phase) * 20 * intensity };
+  const phase = time / 400;
+  const cos = Math.cos(phase);
+  const sin = Math.sin(phase);
+  return { x: ((x + 40) * cos - y * sin - x) * intensity, y: ((x + 40) * sin + y * cos - y) * intensity };
 }
