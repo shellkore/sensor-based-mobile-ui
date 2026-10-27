@@ -1,0 +1,19 @@
+{
+  "name": "sensor-based-mobile-ui",
+  "version": "0.0.0",
+  "private": true,
+  "description": "UI templates and components for sensor-responsive React, Next.js, and React Native applications",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/shellkore/sensor-based-mobile-ui.git"
+  },
+  "keywords": [
+    "ui",
+    "mobile",
+    "sensors",
+    "react",
+    "nextjs",
+    "react-native"
+  ],
+  "license": "UNLICENSED"
+}
