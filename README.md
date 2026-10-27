@@ -4,7 +4,7 @@ A UI library in development for building interfaces that respond to mobile devic
 
 ## Project status
 
-The first option, `ScaredUI`, is available for React and Next.js. The package is not published yet; React Native support is planned.
+`ScaredUI` and `MagneticUI` are available for React and Next.js. React Native support is planned. The package is not published yet.
 
 ### scaredUI
 
@@ -26,6 +26,25 @@ export default function Example() {
 React 18 or newer is a peer dependency. For Next.js, use this component from a client component. The browser must expose `AmbientLightSensor` in a secure context (HTTPS or localhost), and the device must have a usable sensor. Browser support is limited, and permissions or embedding policies can block access. Unsupported or denied access leaves the children usable and displays a message. The sensor measures light, not distance: lighting changes and shadows can also trigger the effect. Recalibrate when the surrounding light changes. Motion is disabled when the user prefers reduced motion.
 
 Each direct child gets an inline-block wrapper, so its layout may differ from an unwrapped child. Use direct children for elements that should move independently.
+
+### magneticUI
+
+`MagneticUI` moves its direct children in response to changes in the device's magnetic field. Hold the device still while enabling it: the first valid reading is the baseline. Rotate or move the device to change the reading, and recalibrate to set a new baseline.
+
+```jsx
+import { MagneticUI } from 'sensor-based-mobile-ui';
+
+export default function Example() {
+  return (
+    <MagneticUI>
+      <button>Explore</button>
+      <button>Discover</button>
+    </MagneticUI>
+  );
+}
+```
+
+The browser must expose `Magnetometer` in a secure context (HTTPS or localhost), with a usable sensor and permission to access it. Support is limited and embedding policies can block access. Unsupported or denied access leaves the children usable and displays a message. The effect uses changes in the sensor's x and y field readings, including changes caused by device rotation or nearby magnetic objects; it does not locate a magnet. Motion is limited and disabled when the user prefers reduced motion. As with `ScaredUI`, each direct child receives an inline-block wrapper. React 18 or newer is required; in Next.js, use a client component.
 
 ## Planned structure
 
@@ -51,13 +70,37 @@ git clone https://github.com/shellkore/sensor-based-mobile-ui.git
 cd sensor-based-mobile-ui
 ```
 
-Install the package from a local checkout alongside React, then import `ScaredUI` as shown above. Run `npm test` to check the shared behavior. There is no build step.
+Install the package from a local checkout alongside React, then import either component as shown above. Run `npm test` to check the shared behavior. There is no build step.
 
 To run or deploy the interactive demo app, see [demos/README.md](demos/README.md).
 
 ## npm publishing
 
-The project is intended for publication on npm once it has a documented, tested public API. The root package is marked private to prevent an accidental release of this scaffold. Before publishing, choose and verify the package name and ownership, add a license, implement and test the package entry points for the supported platforms, and remove the `private` flag. Use `npm pack --dry-run` to inspect the package contents before publishing.
+The package is configured as `sensor-based-mobile-ui` at version `0.1.0`. Publishing creates its public npm page; the page does not need to be created separately.
+
+1. Create an [npm account](https://www.npmjs.com/signup), verify your email, and enable [two-factor authentication](https://docs.npmjs.com/configuring-two-factor-authentication/).
+2. In a terminal at the repository root, sign in and confirm the account:
+
+   ```bash
+   npm login
+   npm whoami
+   ```
+
+3. Check whether the name is available at [npmjs.com/package/sensor-based-mobile-ui](https://www.npmjs.com/package/sensor-based-mobile-ui). If it is taken, change `name` in `package.json` and update the import examples. For a package under your npm account scope, use `@YOUR_NPM_USERNAME/sensor-based-mobile-ui` and publish with `npm publish --access public`.
+4. Choose a license before distributing the library. Until then, `package.json` says `UNLICENSED` and the repository does not grant an open-source license. Review the code and README you intend to release, then check the tests and package contents:
+
+   ```bash
+   npm test
+   npm pack --dry-run
+   ```
+
+5. Publish from the repository root, following any npm authentication or 2FA prompts:
+
+   ```bash
+   npm publish
+   ```
+
+After publishing, install it with `npm install sensor-based-mobile-ui react` and find its page at [npmjs.com/package/sensor-based-mobile-ui](https://www.npmjs.com/package/sensor-based-mobile-ui). A published name and version cannot be reused, so increment the version for later releases (for example, `npm version patch`), review the package, and run `npm publish` again. See the [npm publishing guide](https://docs.npmjs.com/creating-and-publishing-unscoped-public-packages/) for details.
 
 ## Contributing
 

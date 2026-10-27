@@ -1,3 +1,3 @@
 # Shared core
 
-The scaredUI motion model converts ambient light readings into movement independently of browser APIs.
+The scaredUI and magneticUI motion models convert ambient light and magnetic field readings into movement independently of browser APIs.

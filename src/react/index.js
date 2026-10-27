@@ -2,6 +2,7 @@
 
 import React, { useEffect, useRef, useState } from 'react';
 import { createScaredState, readLight, scaredMotion } from '../core/scared.js';
+import { createMagneticState, readMagneticField, magneticMotion } from '../core/magnetic.js';
 
 export function ScaredUI({ children, className }) {
   const [status, setStatus] = useState('idle');
@@ -64,6 +65,73 @@ export function ScaredUI({ children, className }) {
       active: 'Cover the light sensor to make the interface shiver.',
       dark: 'There is not enough light to calibrate. Move somewhere brighter and recalibrate.',
       unavailable: 'Ambient light sensing is unavailable or permission was denied.'
+    }[status]),
+    React.Children.map(children, (child, index) => React.createElement('div', {
+      ref: element => { elements.current[index] = element; },
+      style: { display: 'inline-block' }
+    }, child))
+  );
+}
+
+export function MagneticUI({ children, className }) {
+  const [status, setStatus] = useState('idle');
+  const [session, setSession] = useState(0);
+  const elements = useRef([]);
+
+  useEffect(() => {
+    if (!session) return;
+    if (!window.isSecureContext || !('Magnetometer' in window)) {
+      setStatus('unavailable');
+      return;
+    }
+
+    let sensor;
+    let frame;
+    let state = createMagneticState();
+    const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
+    const reset = () => elements.current.forEach(element => {
+      if (element) element.style.transform = '';
+    });
+    const animate = () => {
+      const { x, y } = reducedMotion.matches ? { x: 0, y: 0 } : magneticMotion(state);
+      elements.current.forEach(element => {
+        if (element) element.style.transform = `translate(${x}px, ${y}px)`;
+      });
+      frame = requestAnimationFrame(animate);
+    };
+    try {
+      sensor = new window.Magnetometer({ frequency: 10 });
+      sensor.addEventListener('reading', () => {
+        state = readMagneticField(state, sensor.x, sensor.y);
+        if (state.baseline) setStatus('active');
+      });
+      sensor.addEventListener('error', () => {
+        sensor.stop();
+        cancelAnimationFrame(frame);
+        reset();
+        setStatus('unavailable');
+      });
+      sensor.start();
+      frame = requestAnimationFrame(animate);
+    } catch {
+      sensor?.stop();
+      reset();
+      setStatus('unavailable');
+    }
+    return () => {
+      sensor?.stop();
+      cancelAnimationFrame(frame);
+      reset();
+    };
+  }, [session]);
+
+  return React.createElement('div', { className },
+    React.createElement('button', { type: 'button', onClick: () => { setStatus('starting'); setSession(value => value + 1); } }, session ? 'Recalibrate magneticUI' : 'Enable magneticUI'),
+    React.createElement('p', { role: 'status' }, {
+      idle: 'Hold your device still, then enable magneticUI.',
+      starting: 'Keep your device still while calibrating.',
+      active: 'Move or rotate your device to change the magnetic field.',
+      unavailable: 'Magnetic field sensing is unavailable or permission was denied.'
     }[status]),
     React.Children.map(children, (child, index) => React.createElement('div', {
       ref: element => { elements.current[index] = element; },
