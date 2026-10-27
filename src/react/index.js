@@ -235,16 +235,16 @@ export function CompassUI({ children, className }) {
     };
     const onOrientation = event => {
       state = readMagneticHeading(state, event.webkitCompassHeading);
-      if (state.baseline) { clearTimeout(timeout); setStatus('compass-active'); }
+      if (state.field) { clearTimeout(timeout); setStatus('compass-active'); }
     };
     try {
       if (source === 'compass') {
         window.addEventListener('deviceorientation', onOrientation);
       } else {
-        sensor = new window.Magnetometer({ frequency: 10 });
+        sensor = new window.Magnetometer({ frequency: 10, referenceFrame: 'screen' });
         sensor.addEventListener('reading', () => {
           state = readMagneticField(state, sensor.x, sensor.y);
-          if (state.baseline) { clearTimeout(timeout); setStatus('active'); }
+          if (state.field) { clearTimeout(timeout); setStatus('active'); }
         });
         sensor.addEventListener('error', () => {
           sensor.stop();
@@ -272,13 +272,13 @@ export function CompassUI({ children, className }) {
   }, [session, source]);
 
   return React.createElement('div', { className },
-    React.createElement('button', { type: 'button', onClick: enable, disabled: status === 'permission' }, session ? 'Recalibrate compassUI' : 'Enable compassUI'),
+    React.createElement('button', { type: 'button', onClick: enable, disabled: status === 'permission' }, session ? 'Restart compassUI' : 'Enable compassUI'),
     React.createElement('p', { role: 'status' }, {
-      idle: 'Hold your device still, then enable compassUI.',
+      idle: 'Hold your phone flat in portrait, then enable compassUI.',
       permission: 'Waiting for motion and orientation permission.',
-      starting: 'Keep your device still while calibrating.',
-      active: 'Move or rotate your device to change the magnetic field.',
-      'compass-active': 'Rotate your device to change its compass heading.',
+      starting: 'Waiting for a compass reading.',
+      active: 'Hold your phone flat and rotate it. The content shifts toward magnetic north.',
+      'compass-active': 'Hold your phone flat and rotate it. The content shifts toward magnetic north.',
       insecure: 'Magnetic sensing requires HTTPS or localhost.',
       unsupported: 'This browser does not provide magnetic sensing or a compass heading.',
       denied: 'Motion and orientation access was denied. Check your browser settings and try again.',
@@ -377,3 +377,4 @@ export function TornadoUI({ children, className }) {
     }, child))
   );
 }
+

@@ -46,7 +46,7 @@ Each direct child gets an inline-block wrapper, so its layout may differ from an
 
 ### compassUI
 
-`CompassUI` moves its direct children in response to changes in the device's magnetic field or compass heading. Hold the device still while enabling it: the first valid reading is the baseline. Rotate or move the device to change the reading, and recalibrate to set a new baseline.
+`CompassUI` shifts its direct children toward magnetic north. Hold the phone flat with the screen facing up in portrait orientation, enable the experience, and rotate the phone: when its top points north, the children move up; when it points east, they move left. No starting direction or recalibration is needed.
 
 ```jsx
 import { CompassUI } from 'sensor-based-mobile-ui';
@@ -61,7 +61,7 @@ export default function Example() {
 }
 ```
 
-`MagneticUI` remains available as an alias for existing users. Magnetic sensing requires a secure context (HTTPS or localhost), compatible hardware, and permission. Where the browser exposes `Magnetometer`, the effect uses changes in its x and y field readings. On iPhone, browsers can instead use the compass heading from device orientation events; tap Enable and allow motion and orientation access when prompted. Rotate the phone to see the effect. The compass fallback responds to heading changes, not field strength, and neither method locates a magnet. Support varies, and browser settings or embedding policies can block access. If access is unavailable or denied, the children remain usable and a message is displayed. Motion is limited and disabled when the user prefers reduced motion. As with `ScaredUI`, each direct child receives an inline-block wrapper. React 18 or newer is required; in Next.js, use a client component.
+`MagneticUI` remains available as an alias for existing users. Magnetic sensing requires a secure context (HTTPS or localhost), compatible hardware, and permission. Where the browser exposes `Magnetometer`, the effect uses its x and y field readings to estimate magnetic north when the phone is flat. On iPhone, browsers can instead use the compass heading from device orientation events; tap Enable and allow motion and orientation access when prompted. Rotate the phone to see the effect. The compass fallback uses heading rather than field strength, and neither method locates a magnet. Magnetic north differs from geographic north; nearby magnets and tilted devices can affect accuracy. Support varies, and browser settings or embedding policies can block access. If access is unavailable or denied, the children remain usable and a message is displayed. Motion is limited and disabled when the user prefers reduced motion. As with `ScaredUI`, each direct child receives an inline-block wrapper. React 18 or newer is required; in Next.js, use a client component.
 
 ## Planned structure
 

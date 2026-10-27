@@ -12,7 +12,7 @@ npm install
 npm run dev
 ```
 
-Open the local URL Vite prints. Sensor access requires a supported browser and device in a secure context. `localhost` works for local testing on the same device; use the HTTPS deployment to test on a phone. Keep the light sensor uncovered while enabling or recalibrating scaredUI, and hold the device still while calibrating compassUI. On iPhone, compassUI can use compass heading and asks for motion and orientation access when enabled. Browsers without sensor access display a message and keep the content usable.
+Open the local URL Vite prints. Sensor access requires a supported browser and device in a secure context. `localhost` works for local testing on the same device; use the HTTPS deployment to test on a phone. Keep the light sensor uncovered while enabling or recalibrating scaredUI, and hold the phone flat in portrait orientation when using compassUI. On iPhone, compassUI can use compass heading and asks for motion and orientation access when enabled. Browsers without sensor access display a message and keep the content usable.
 
 For tornadoUI, enable motion access and rotate the phone quickly to make the tiles swirl. The movement settles as the phone stops.
 

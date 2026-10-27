@@ -2,22 +2,22 @@ import { test } from 'node:test';
 import { strict as assert } from 'node:assert';
 import { createMagneticState, readMagneticField, readMagneticHeading, magneticMotion } from './magnetic.js';
 
-test('calibrates, follows field changes, limits movement, and ignores invalid readings', () => {
-  const initial = readMagneticField(createMagneticState(), 10, 20);
-  assert.deepEqual(magneticMotion(initial), { x: 0, y: 0 });
-  const changed = readMagneticField(initial, 20, 25);
-  assert.deepEqual(magneticMotion(changed), { x: 16, y: -8 });
-  const limited = magneticMotion(readMagneticField(initial, 1010, 1020));
-  assert.ok(Math.abs(Math.hypot(limited.x, limited.y) - 48) < 1e-10);
-  assert.equal(readMagneticField(changed, NaN, 1), changed);
-  assert.deepEqual(magneticMotion(readMagneticField(createMagneticState(), 20, 25)), { x: 0, y: 0 });
+test('compass heading moves toward north in all four directions', () => {
+  for (const [heading, x, y] of [[0, 0, -48], [90, -48, 0], [180, 0, 48], [270, 48, 0], [359.999, 0, -48]]) {
+    const motion = magneticMotion(readMagneticHeading(createMagneticState(), heading));
+    assert.ok(Math.abs(motion.x - x) < 0.01);
+    assert.ok(Math.abs(motion.y - y) < 0.01);
+  }
 });
 
-test('compass headings calibrate, wrap around north, and reject invalid readings', () => {
-  const initial = readMagneticHeading(createMagneticState(), 359);
+test('field readings point north and invalid readings leave the last direction unchanged', () => {
+  const initial = createMagneticState();
   assert.deepEqual(magneticMotion(initial), { x: 0, y: 0 });
-  assert.ok(Math.hypot(...Object.values(magneticMotion(readMagneticHeading(initial, 1)))) < 2);
-  assert.ok(Math.hypot(...Object.values(magneticMotion(readMagneticHeading(initial, 90)))) > 10);
-  assert.equal(readMagneticHeading(initial, -1), initial);
-  assert.equal(readMagneticHeading(initial, null), initial);
+  const north = readMagneticField(initial, 0, 20);
+  assert.deepEqual(magneticMotion(north), { x: 0, y: -48 });
+  assert.deepEqual(magneticMotion(readMagneticField(north, -10, 0)), { x: -48, y: 0 });
+  assert.equal(readMagneticField(north, 0, 0), north);
+  assert.equal(readMagneticField(north, NaN, 1), north);
+  assert.equal(readMagneticHeading(north, -1), north);
+  assert.equal(readMagneticHeading(north, null), north);
 });
