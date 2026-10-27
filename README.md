@@ -2,6 +2,8 @@
 
 A UI library in development for building interfaces that respond to mobile device sensors. The goal is to offer a selection of reusable UI templates and components for React, Next.js, and React Native, so developers can choose the experience that fits their app.
 
+[Explore the live demo](https://sensor-based-mobile-ui.vercel.app/) · [Read the documentation](https://sensor-based-mobile-ui.vercel.app/docs)
+
 If you like this project, please [star the repository](https://github.com/shellkore/sensor-based-mobile-ui) and consider sponsoring its development.
 
 ## Project status
