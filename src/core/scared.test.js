@@ -21,3 +21,16 @@ test('calibrates, responds more to a fast shadow, and settles after light return
   assert.equal(readLight(initial, NaN, 1200), initial);
   assert.deepEqual(scaredMotion(readLight(createScaredState(), 0, 1000), 1000, 1), { x: 0, y: 0, rotate: 0 });
 });
+
+test('keeps shaking while covered and reacts more to a darker view', () => {
+  const baseline = readLight(createScaredState(), 100, 1000);
+  const partlyCovered = readLight(readLight(baseline, 60, 1100), 60, 12000);
+  const mostlyCovered = readLight(readLight(baseline, 10, 1100), 10, 12000);
+  const partialMotion = scaredMotion(partlyCovered, 12100, 1);
+  const closeMotion = scaredMotion(mostlyCovered, 12100, 1);
+  const amplitude = motion => Math.hypot(motion.x, motion.y);
+  assert.ok(amplitude(partialMotion) > 3);
+  assert.ok(amplitude(closeMotion) > amplitude(partialMotion) * 2);
+  assert.notDeepEqual(scaredMotion(mostlyCovered, 12100, 1), scaredMotion(mostlyCovered, 12140, 1));
+  assert.deepEqual(scaredMotion(readLight(mostlyCovered, 100, 12200), 12200, 1), { x: 0, y: 0, rotate: 0 });
+});
