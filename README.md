@@ -105,34 +105,6 @@ Install the package from a local checkout alongside React, then import either co
 
 To run or deploy the interactive demo app, see [demos/README.md](demos/README.md).
 
-## npm publishing
-
-The package is configured as `sensor-based-mobile-ui` at version `0.1.0`. Publishing creates its public npm page; the page does not need to be created separately.
-
-1. Create an [npm account](https://www.npmjs.com/signup), verify your email, and enable [two-factor authentication](https://docs.npmjs.com/configuring-two-factor-authentication/).
-2. In a terminal at the repository root, sign in and confirm the account:
-
-   ```bash
-   npm login
-   npm whoami
-   ```
-
-3. Check whether the name is available at [npmjs.com/package/sensor-based-mobile-ui](https://www.npmjs.com/package/sensor-based-mobile-ui). If it is taken, change `name` in `package.json` and update the import examples. For a package under your npm account scope, use `@YOUR_NPM_USERNAME/sensor-based-mobile-ui` and publish with `npm publish --access public`.
-4. Review the code and README you intend to release, then check the tests and package contents:
-
-   ```bash
-   npm test
-   npm pack --dry-run
-   ```
-
-5. Publish from the repository root, following any npm authentication or 2FA prompts:
-
-   ```bash
-   npm publish
-   ```
-
-After publishing, install it with `npm install sensor-based-mobile-ui react` and find its page at [npmjs.com/package/sensor-based-mobile-ui](https://www.npmjs.com/package/sensor-based-mobile-ui). A published name and version cannot be reused, so increment the version for later releases (for example, `npm version patch`), review the package, and run `npm publish` again. See the [npm publishing guide](https://docs.npmjs.com/creating-and-publishing-unscoped-public-packages/) for details.
-
 ## Contributing
 
 Issues and contributions are welcome. As sensor interactions and UI designs are decided, this README will document supported devices, setup, usage, and contribution checks.
