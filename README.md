@@ -2,6 +2,8 @@
 
 A UI library in development for building interfaces that respond to mobile device sensors. The goal is to offer a selection of reusable UI templates and components for React, Next.js, and React Native, so developers can choose the experience that fits their app.
 
+If you like this project, please [star the repository](https://github.com/shellkore/sensor-based-mobile-ui) and consider sponsoring its development.
+
 ## Project status
 
 `ScaredUI`, `CompassUI`, `TornadoUI`, and `EarthquakeUI` are available for React and Next.js. React Native support is planned. The package is not published yet.
