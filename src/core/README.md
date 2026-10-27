@@ -1,3 +1,3 @@
 # Shared core
 
-Platform-independent behavior shared by UI templates belongs here. Sensor-specific behavior will be added when its requirements are defined.
+The scaredUI motion model converts ambient light readings into movement independently of browser APIs.

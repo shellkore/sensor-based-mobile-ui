@@ -1,3 +1,3 @@
 # React and Next.js
 
-Web components and UI templates belong here. Next.js integrations must account for server rendering and access browser sensors only on the client.
+`ScaredUI` is the first web component. See the root README for usage, calibration, and browser requirements. Sensor access starts only on the client after the user enables it.

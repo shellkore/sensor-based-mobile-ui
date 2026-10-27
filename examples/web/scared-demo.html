@@ -1,0 +1,62 @@
+<!doctype html>
+<html lang="en">
+<meta charset="utf-8">
+<title>scaredUI simulated mobile demo</title>
+<style>body{margin:0;background:#101528;display:grid;place-items:center;min-height:100vh}canvas{height:100vh;max-width:100%}</style>
+<canvas id="demo" width="720" height="1280" aria-label="Simulated scaredUI mobile demo"></canvas>
+<script type="module">
+import { createScaredState, readLight, scaredMotion } from '../../src/core/scared.js';
+
+const canvas = document.querySelector('canvas');
+const ctx = canvas.getContext('2d');
+const round = (x,y,w,h,r,color) => { ctx.fillStyle=color; ctx.beginPath(); ctx.roundRect(x,y,w,h,r); ctx.fill(); };
+const text = (s,x,y,size,color,weight='500') => { ctx.fillStyle=color; ctx.font=`${weight} ${size}px system-ui`; ctx.fillText(s,x,y); };
+let state = createScaredState(), start, lastSample = -Infinity;
+
+function draw(now) {
+  if (start === undefined) start = now;
+  const t = (now - start) / 1000;
+  // Simulated readings: uncovered, a slow approach, recovery, then a quick approach.
+  let lux = t < 2 ? 100 : t < 4 ? 100 - (t - 2) * 35 : t < 5 ? 30 + (t - 4) * 70 : t < 6 ? 100 : t < 7.2 ? 18 : 100;
+  if (now - lastSample >= 100) { state = readLight(state, lux, now); lastSample = now; }
+  ctx.fillStyle='#101528'; ctx.fillRect(0,0,720,1280);
+  text('scaredUI',48,77,32,'#fff','700');
+  text('SIMULATED SENSOR DEMO',48,112,18,'#aab4d6','700');
+  round(87,145,546,990,66,'#070a13'); round(101,159,518,962,54,'#f8f7ff');
+  round(285,174,150,24,12,'#15182b');
+  text('9:41',130,207,21,'#252840','700'); text('●  ▰',539,207,20,'#252840','700');
+  text('Good morning,',140,290,25,'#777d9b'); text('Mansi ✨',140,340,43,'#252840','700');
+  text('Your day at a glance',140,380,21,'#777d9b');
+  const cards = [
+    {x:140,y:425,w:440,h:155,title:'Your focus',sub:'Make space for a little magic',color:'#ded9ff',icon:'✦'},
+    {x:140,y:605,w:210,h:180,title:'Ideas',sub:'12 saved',color:'#ffe5d7',icon:'✳'},
+    {x:370,y:605,w:210,h:180,title:'Today',sub:'3 things to do',color:'#d6f0e9',icon:'☼'},
+    {x:140,y:810,w:440,h:105,title:'Take a moment',sub:'Breathe in. Breathe out.',color:'#e8eafd',icon:'♡'}
+  ];
+  cards.forEach((card,i) => {
+    const motion = scaredMotion(state, now, i);
+    ctx.save(); ctx.translate(card.x+card.w/2+motion.x,card.y+card.h/2+motion.y); ctx.rotate(motion.rotate*Math.PI/180);
+    ctx.translate(-card.w/2,-card.h/2); round(0,0,card.w,card.h,25,card.color);
+    text(card.icon,24,47,30,'#57517e','700'); text(card.title,24,card.h-56,24,'#252840','700'); text(card.sub,24,card.h-25,16,'#696d85'); ctx.restore();
+  });
+  round(140,955,440,58,20,'#5550c8'); text('Explore your space',239,993,20,'#fff','700');
+  text('HOME',147,1054,15,'#5550c8','700'); text('SEARCH',291,1054,15,'#8d92ad','700'); text('PROFILE',462,1054,15,'#8d92ad','700');
+  const caption = t < 2 ? 'Calibrated in room light' : t < 4 ? 'Hand approaches slowly' : t < 5 ? 'Light returns · UI settles' : t < 6 ? 'Ready for a quicker approach' : t < 7.2 ? 'Fast approach · stronger shake' : 'Light returns · UI settles';
+  text(caption,48,1200,25,'#fff','700'); text('Illustration uses simulated light readings, not a device recording.',48,1234,16,'#aab4d6');
+  requestAnimationFrame(draw);
+}
+requestAnimationFrame(draw);
+
+window.recordDemo = async () => {
+  const chunks = [];
+  const recorder = new MediaRecorder(canvas.captureStream(30), { mimeType: 'video/webm;codecs=vp9', videoBitsPerSecond: 4000000 });
+  recorder.ondataavailable = event => { if (event.data.size) chunks.push(event.data); };
+  recorder.start();
+  await new Promise(resolve => setTimeout(resolve, 9000));
+  await new Promise(resolve => { recorder.onstop = resolve; recorder.stop(); });
+  const data = new Uint8Array(await new Blob(chunks, {type:'video/webm'}).arrayBuffer());
+  let binary = ''; for (const byte of data) binary += String.fromCharCode(byte);
+  return btoa(binary);
+};
+</script>
+</html>
