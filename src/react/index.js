@@ -4,6 +4,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import { createScaredState, frameBrightness, readLight, scaredMotion } from '../core/scared.js';
 import { createMagneticState, readMagneticField, readMagneticHeading, magneticMotion } from '../core/magnetic.js';
 import { readRotation, tornadoMotion } from '../core/tornado.js';
+import { readEarthquake, earthquakeMotion } from '../core/earthquake.js';
 
 export function ScaredUI({ children, className }) {
   const [status, setStatus] = useState('idle');
@@ -378,3 +379,80 @@ export function TornadoUI({ children, className }) {
   );
 }
 
+export function EarthquakeUI({ children, className }) {
+  const [status, setStatus] = useState('idle');
+  const [session, setSession] = useState(0);
+  const elements = useRef([]);
+  const request = useRef(0);
+
+  useEffect(() => () => { request.current++; }, []);
+
+  const enable = async () => {
+    const current = ++request.current;
+    if (!window.isSecureContext) { setStatus('insecure'); return; }
+    if (!window.DeviceMotionEvent) { setStatus('unsupported'); return; }
+    setStatus('permission');
+    try {
+      if (typeof window.DeviceMotionEvent.requestPermission === 'function' &&
+          await window.DeviceMotionEvent.requestPermission() !== 'granted') {
+        if (current === request.current) setStatus('denied');
+        return;
+      }
+    } catch {
+      if (current === request.current) setStatus('denied');
+      return;
+    }
+    if (current !== request.current) return;
+    setStatus('starting');
+    setSession(value => value + 1);
+  };
+
+  useEffect(() => {
+    if (!session) return;
+    let state = null;
+    let frame;
+    const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
+    const timeout = setTimeout(() => setStatus('unavailable'), 8000);
+    const onMotion = event => {
+      const reading = readEarthquake(event.acceleration, Date.now(), state);
+      if (!reading) return;
+      state = reading;
+      clearTimeout(timeout);
+      setStatus('active');
+    };
+    const animate = () => {
+      elements.current.forEach((element, index) => {
+        if (!element) return;
+        const { x, y, rotate } = reducedMotion.matches ? { x: 0, y: 0, rotate: 0 } : earthquakeMotion(state, Date.now(), index);
+        element.style.transform = `translate(${x}px, ${y}px) rotate(${rotate}deg)`;
+      });
+      frame = requestAnimationFrame(animate);
+    };
+    window.addEventListener('devicemotion', onMotion);
+    frame = requestAnimationFrame(animate);
+    return () => {
+      window.removeEventListener('devicemotion', onMotion);
+      clearTimeout(timeout);
+      cancelAnimationFrame(frame);
+      elements.current.forEach(element => { if (element) element.style.transform = ''; });
+    };
+  }, [session]);
+
+  return React.createElement('div', { className, style: { position: 'relative' } },
+    React.createElement('button', { type: 'button', disabled: status === 'permission' || status === 'active' || status === 'starting', onClick: enable }, status === 'active' ? 'EarthquakeUI enabled' : session ? 'Try earthquakeUI again' : 'Enable earthquakeUI'),
+    React.createElement('p', { role: 'status' }, {
+      idle: 'Enable earthquakeUI, then shake your phone.',
+      permission: 'Waiting for motion permission.',
+      starting: 'Waiting for a motion sensor reading.',
+      active: 'Shake your phone to move the elements. They will slowly return when you stop.',
+      insecure: 'Motion sensing requires HTTPS or localhost.',
+      unsupported: 'This browser does not provide motion sensing.',
+      denied: 'Motion access was denied. Check your browser settings and try again.',
+      unavailable: 'No acceleration reading was received. Check your device and browser settings.'
+    }[status]),
+    React.Children.map(children, (child, index) => React.createElement('div', {
+      ref: element => { elements.current[index] = element; },
+      style: { display: 'inline-block' }
+    }, child))
+  );
+}

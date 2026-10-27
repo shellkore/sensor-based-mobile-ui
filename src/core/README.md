@@ -1,3 +1,3 @@
 # Shared core
 
-The scaredUI, compassUI, and tornadoUI motion models convert ambient light, magnetic field, compass heading, and rotation-rate readings into movement independently of browser APIs.
+The scaredUI, compassUI, tornadoUI, and earthquakeUI motion models convert ambient light, magnetic field, compass heading, rotation-rate, and acceleration readings into movement independently of browser APIs.
