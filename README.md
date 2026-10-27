@@ -4,7 +4,22 @@ A UI library in development for building interfaces that respond to mobile devic
 
 ## Project status
 
-`ScaredUI` and `CompassUI` are available for React and Next.js. React Native support is planned. The package is not published yet.
+`ScaredUI`, `CompassUI`, and `TornadoUI` are available for React and Next.js. React Native support is planned. The package is not published yet.
+
+### tornadoUI
+
+`TornadoUI` moves its direct children in a swirling pattern when the phone rotates quickly. The effect fades when movement stops.
+
+```jsx
+import { TornadoUI } from 'sensor-based-mobile-ui';
+
+<TornadoUI>
+  <button>One</button>
+  <button>Two</button>
+</TornadoUI>
+```
+
+Tap Enable and allow motion access if prompted. This requires HTTPS or localhost and a browser and device that provide rotation-rate readings; access can also be blocked by browser or embedding settings. If unavailable, the children remain usable. Motion is disabled when the user prefers reduced motion. Each direct child receives an inline-block wrapper, which can change its layout. React 18 or newer is required; use a client component in Next.js.
 
 ### scaredUI
 
