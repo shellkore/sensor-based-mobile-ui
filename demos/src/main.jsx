@@ -35,7 +35,19 @@ function Home() {
 }
 
 function Scared() {
-  return <main className="scared-page"><a className="back-link" href="/">← &nbsp; ALL EXPERIMENTS</a><section className="scared-intro"><div><div className="eyebrow"><span className="pulse" /> EXPERIMENT 001 <span className="eyebrow-index">/ AMBIENT LIGHT</span></div><h1>Meet <em>scaredUI.</em></h1><p>It’s a little shy. Bring your hand near your light sensor or front camera and watch the interface come to life.</p></div><div className="intro-number" aria-hidden="true">01<span>✳</span></div></section><section className="lab"><div className="lab-copy"><div className="label"><span>✳</span> HOW IT WORKS</div><h2>Make it<br /><em>nervous.</em></h2><p>A shadow over the light sensor or front camera makes the elements shiver. Move quickly and they’ll scatter a little further.</p><div className="steps"><div><span>01</span><p><strong>Find some light</strong>Keep the sensor or camera uncovered while you enable the experience.</p></div><div><span>02</span><p><strong>Make your move</strong>Cover the sensor or front camera with your hand, then move it away.</p></div></div><p className="sensor-note">If the light sensor is unavailable, you can choose the front camera. Changing light or camera exposure can affect the response.</p></div><div className="demo-panel"><div className="panel-heading"><span>LIVE PLAYGROUND <i>✳</i></span><span>001 / SCARED UI</span></div><div className="screen"><div className="screen-top"><span>YOUR LITTLE SPACE</span><span>✳</span></div><div className="greeting">Hello, human<span>✳</span></div><p className="screen-subtitle">A little space with a life of its own.</p><ScaredUI className="scared-demo"><div className="tile tile-wide"><span className="tile-icon">✳</span><span className="tile-bottom"><strong>Make some magic</strong><small>A little inspiration for today.</small></span><span className="tile-arrow">↗</span></div><div className="tile tile-purple"><span className="tile-icon">✦</span><span className="tile-bottom"><strong>Daydream</strong><small>Let your mind wander</small></span></div><div className="tile tile-blue"><span className="tile-icon">◒</span><span className="tile-bottom"><strong>Discover</strong><small>See what’s out there</small></span></div></ScaredUI><div className="screen-footer"><span>MADE TO MOVE</span><span>✳ &nbsp; ✳ &nbsp; ✳</span></div></div><p className="panel-hint"><span className="pulse" /> YOUR DEVICE IS THE CONTROLLER</p></div></section></main>;
+  return <main className="scared-experience"><ScaredUI className="scared-world">
+    <Header />
+    <a className="back-link world-back" href="/">← &nbsp; ALL EXPERIMENTS</a>
+    <div className="eyebrow world-eyebrow"><span className="pulse" /> EXPERIMENT 001 <span className="eyebrow-index">/ AMBIENT LIGHT</span></div>
+    <h1 className="world-title">Meet <em>scaredUI.</em></h1>
+    <p className="world-lead">A little shy, all over. Bring your hand near the light sensor or front camera and watch the whole page react.</p>
+    <section className="world-instructions"><div className="label"><span>✳</span> HOW IT WORKS</div><h2>Make it <em>nervous.</em></h2><p>Keep the sensor or camera uncovered while you enable the experience. Then cover it with your hand and watch the page shiver. Move quickly to make it scatter further.</p><p className="sensor-note">If the light sensor is unavailable, you can choose the front camera. Changing light or camera exposure can affect the response.</p></section>
+    <div className="tile tile-wide"><span className="tile-icon">✳</span><span className="tile-bottom"><strong>Make some magic</strong><small>A little inspiration for today.</small></span><span className="tile-arrow">↗</span></div>
+    <div className="tile tile-purple"><span className="tile-icon">✦</span><span className="tile-bottom"><strong>Daydream</strong><small>Let your mind wander</small></span></div>
+    <div className="tile tile-blue"><span className="tile-icon">◒</span><span className="tile-bottom"><strong>Discover</strong><small>See what’s out there</small></span></div>
+    <p className="world-end"><span className="pulse" /> YOUR DEVICE IS THE CONTROLLER</p>
+    <Footer />
+  </ScaredUI></main>;
 }
 
 function Compass() {
@@ -44,7 +56,7 @@ function Compass() {
 
 function App() {
   const path = window.location.pathname.replace(/\/$/, '');
-  return <div className="app"><Header />{path === '/scared' ? <Scared /> : path === '/compass' ? <Compass /> : path === '/tornado' ? <Tornado /> : path === '/earthquake' ? <Earthquake /> : path === '/pulse' ? <Pulse /> : path === '/gravity' ? <Gravity /> : path === '/docs' ? <Docs /> : path === '' ? <Home /> : <NotFound />}<Footer /></div>;
+  return <div className="app">{path === '/scared' ? <Scared /> : <><Header />{path === '/compass' ? <Compass /> : path === '/tornado' ? <Tornado /> : path === '/earthquake' ? <Earthquake /> : path === '/pulse' ? <Pulse /> : path === '/gravity' ? <Gravity /> : path === '/docs' ? <Docs /> : path === '' ? <Home /> : <NotFound />}<Footer /></>}</div>;
 }
 
 function Tornado() {
