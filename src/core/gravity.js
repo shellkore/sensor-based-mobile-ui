@@ -4,5 +4,5 @@ export function gravityMotion(beta, gamma, angle = 0) {
   const x = Math.sin(gamma * radians) * Math.cos(beta * radians);
   const y = Math.sin(beta * radians);
   const rotation = (Number.isFinite(angle) ? angle : 0) * radians;
-  return { x: 24 * (x * Math.cos(rotation) - y * Math.sin(rotation)), y: 24 * (x * Math.sin(rotation) + y * Math.cos(rotation)) };
+  return { x: 80 * (x * Math.cos(rotation) - y * Math.sin(rotation)), y: 80 * (x * Math.sin(rotation) + y * Math.cos(rotation)) };
 }
