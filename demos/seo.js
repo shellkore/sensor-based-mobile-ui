@@ -19,6 +19,10 @@ const pages = {
     title: 'earthquakeUI | Sensor UI Lab',
     description: 'Try earthquakeUI: shake your phone to scatter interface elements and watch them slowly return.'
   },
+  '/pulse': {
+    title: 'pulseUI | Sensor UI Lab',
+    description: 'Try pulseUI: sound makes interface cards expand and glow, then settle in a quieter room.'
+  },
   '/gravity': {
     title: 'gravityUI | Sensor UI Lab',
     description: 'Try gravityUI: tilt your phone to slide cards toward the lower edge.'

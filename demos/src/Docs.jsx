@@ -22,6 +22,13 @@ const components = [
     limitations: 'Orientation support and permissions vary by device, browser, and embedding settings. If no reading arrives, the component reports it and offers a retry.'
   },
   {
+    name: 'PulseUI', id: 'pulse-ui', demo: '/pulse',
+    description: 'Expands and glows in response to sound from the microphone.',
+    requirements: 'HTTPS or localhost, a microphone, and permission to use it.',
+    instructions: 'Tap Enable, allow microphone access, then play music, speak, or clap. The cards settle as the sound gets quieter.',
+    limitations: 'Audio is processed locally and is not recorded or sent. The microphone stops when you stop it, leave the page, or switch tabs. Loudness varies with the microphone and its processing.'
+  },
+  {
     name: 'ScaredUI', id: 'scared-ui', demo: '/scared',
     description: 'Responds to shadows using ambient light or an optional front-camera fallback.',
     requirements: 'A compatible AmbientLightSensor, or a front camera for the optional fallback, plus HTTPS or localhost and permission where required. The ambient light API is not available in Safari or Chrome on iPhone; choose the camera fallback there.',

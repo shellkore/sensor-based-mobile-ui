@@ -4,6 +4,8 @@ This React/Vite app lists the project's web demos on `/` and provides usage guid
 
 The `/gravity` demo uses `GravityUI`: enable orientation access and tilt the phone to slide the cards.
 
+The `/pulse` demo uses `PulseUI`: enable microphone access and make some noise. Audio is processed locally and is not recorded or sent.
+
 ## Run locally
 
 Requires Node.js 20.19+ or 22.12+.
@@ -24,6 +26,6 @@ The ambient light API used by scaredUI is not available in Safari or Chrome on i
 
 ## Deploy to Vercel
 
-Connect the repository and set **Root Directory** to `demos`. Choose the Vite framework preset if it is not detected; the build command is `npm run build` and the output directory is `dist`. In the Root Directory settings, ensure **Include source files outside of the Root Directory in the Build Step** is enabled: this app imports the shared components from `src` in the repository root. The included `vercel.json` serves route-specific HTML metadata for `/scared`, `/compass`, `/tornado`, `/earthquake`, `/gravity`, and `/docs`. Commit both `demos` and `src` before deploying.
+Connect the repository and set **Root Directory** to `demos`. Choose the Vite framework preset if it is not detected; the build command is `npm run build` and the output directory is `dist`. In the Root Directory settings, ensure **Include source files outside of the Root Directory in the Build Step** is enabled: this app imports the shared components from `src` in the repository root. The included `vercel.json` serves route-specific HTML metadata for `/scared`, `/compass`, `/tornado`, `/earthquake`, `/pulse`, `/gravity`, and `/docs`. Commit both `demos` and `src` before deploying.
 
 Canonical and social-preview URLs use `SITE_URL` if set, Vercel's `VERCEL_PROJECT_PRODUCTION_URL` otherwise, or `https://sensor-based-mobile-ui.vercel.app` as a fallback. Set `SITE_URL` to the preferred public origin if using a custom domain.

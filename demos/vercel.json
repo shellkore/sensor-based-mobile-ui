@@ -4,6 +4,7 @@
     { "source": "/compass", "destination": "/seo/compass.html" },
     { "source": "/tornado", "destination": "/seo/tornado.html" },
     { "source": "/earthquake", "destination": "/seo/earthquake.html" },
+    { "source": "/pulse", "destination": "/seo/pulse.html" },
     { "source": "/gravity", "destination": "/seo/gravity.html" },
     { "source": "/docs", "destination": "/seo/docs.html" }
   ]

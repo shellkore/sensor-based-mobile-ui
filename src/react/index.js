@@ -5,6 +5,7 @@ import { createScaredState, frameBrightness, readLight, scaredMotion } from '../
 import { createMagneticState, readMagneticField, readMagneticHeading, magneticMotion } from '../core/magnetic.js';
 import { readRotation, tornadoMotion } from '../core/tornado.js';
 import { readEarthquake, earthquakeMotion } from '../core/earthquake.js';
+import { readLoudness } from '../core/pulse.js';
 import { gravityMotion } from '../core/gravity.js';
 
 export function ScaredUI({ children, className }) {
@@ -454,6 +455,103 @@ export function EarthquakeUI({ children, className }) {
     React.Children.map(children, (child, index) => React.createElement('div', {
       ref: element => { elements.current[index] = element; },
       style: { display: 'inline-block' }
+    }, child))
+  );
+}
+
+export function PulseUI({ children, className }) {
+  const [status, setStatus] = useState('idle');
+  const [stream, setStream] = useState(null);
+  const elements = useRef([]);
+  const request = useRef(0);
+  const streamRef = useRef(null);
+
+  const stop = () => {
+    request.current++;
+    streamRef.current?.getTracks().forEach(track => track.stop());
+    streamRef.current = null;
+    setStream(null);
+    setStatus('stopped');
+  };
+
+  useEffect(() => {
+    const onHidden = () => { if (document.hidden) stop(); };
+    document.addEventListener('visibilitychange', onHidden);
+    return () => {
+      document.removeEventListener('visibilitychange', onHidden);
+      request.current++;
+      streamRef.current?.getTracks().forEach(track => track.stop());
+    };
+  }, []);
+
+  const start = async () => {
+    const current = ++request.current;
+    if (!navigator.mediaDevices?.getUserMedia || !window.AudioContext) { setStatus('unavailable'); return; }
+    setStatus('pending');
+    try {
+      const audio = await navigator.mediaDevices.getUserMedia({ audio: { echoCancellation: false, noiseSuppression: false, autoGainControl: false }, video: false });
+      if (current !== request.current || document.hidden) { audio.getTracks().forEach(track => track.stop()); return; }
+      streamRef.current = audio;
+      setStream(audio);
+      setStatus('active');
+    } catch {
+      if (current === request.current) setStatus('unavailable');
+    }
+  };
+
+  useEffect(() => {
+    if (!stream) return;
+    let context;
+    let frame;
+    let active = true;
+    const onEnded = () => { if (active) { stop(); setStatus('unavailable'); } };
+    const tracks = stream.getAudioTracks();
+    tracks.forEach(track => track.addEventListener('ended', onEnded));
+    try {
+      context = new window.AudioContext();
+      const source = context.createMediaStreamSource(stream);
+      const analyser = context.createAnalyser();
+      analyser.fftSize = 1024;
+      source.connect(analyser);
+      const samples = new Float32Array(analyser.fftSize);
+      const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
+      let level = 0;
+      const animate = () => {
+        analyser.getFloatTimeDomainData(samples);
+        level = readLoudness(samples, level);
+        elements.current.forEach(element => {
+          if (!element) return;
+          element.style.transform = reducedMotion.matches ? '' : `scale(${1 + level * 0.08})`;
+          element.style.boxShadow = `0 0 ${level * 30}px rgba(182, 245, 91, ${level * 0.7})`;
+        });
+        frame = requestAnimationFrame(animate);
+      };
+      context.resume().catch(onEnded);
+      frame = requestAnimationFrame(animate);
+    } catch { onEnded(); }
+    return () => {
+      active = false;
+      tracks.forEach(track => track.removeEventListener('ended', onEnded));
+      cancelAnimationFrame(frame);
+      context?.close();
+      stream.getTracks().forEach(track => track.stop());
+      elements.current.forEach(element => { if (element) { element.style.transform = ''; element.style.boxShadow = ''; } });
+    };
+  }, [stream]);
+
+  return React.createElement('div', { className },
+    React.createElement('button', { type: 'button', onClick: stream || status === 'pending' ? stop : start },
+      stream ? 'Stop microphone' : status === 'pending' ? 'Cancel microphone request' : 'Enable pulseUI'),
+    React.createElement('p', { role: 'status' }, {
+      idle: 'Enable the microphone, then play music, speak, or clap.',
+      pending: 'Waiting for microphone permission.',
+      active: 'Microphone active. Sound makes the cards pulse.',
+      stopped: 'Microphone stopped.',
+      unavailable: 'Microphone access is unavailable or denied. Check your browser settings and try again.'
+    }[status]),
+    React.Children.map(children, (child, index) => React.createElement('div', {
+      ref: element => { elements.current[index] = element; },
+      style: { display: 'inline-block', borderRadius: '10px' }
     }, child))
   );
 }
