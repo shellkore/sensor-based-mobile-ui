@@ -35,7 +35,7 @@ function Home() {
 }
 
 function Scared() {
-  return <main className="scared-experience"><ScaredUI className="scared-world">
+  return <main className="scared-experience"><ScaredUI className="scared-world" controlsAfter={5} animateControls>
     <Header />
     <a className="back-link world-back" href="/">← &nbsp; ALL EXPERIMENTS</a>
     <div className="eyebrow world-eyebrow"><span className="pulse" /> EXPERIMENT 001 <span className="eyebrow-index">/ AMBIENT LIGHT</span></div>

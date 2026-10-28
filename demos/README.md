@@ -22,7 +22,7 @@ For earthquakeUI, enable motion access and shake the phone. Stronger shakes move
 
 For tornadoUI, enable motion access and rotate the phone quickly to make the tiles swirl. The movement settles as the phone stops.
 
-The scaredUI demo applies the effect to the whole page while keeping the controls still. The ambient light API used by scaredUI is not available in Safari or Chrome on iPhone. When the sensor is unavailable, choose **Use front camera**, allow camera access, and keep the camera uncovered while it calibrates. Move your hand over the camera's view to try the effect. Frames are processed locally and are not saved or sent; use **Stop camera** to stop capture. Camera exposure or scene changes may affect the response. Some Chromium browsers require an experimental flag and compatible hardware for sensor access.
+The scaredUI demo applies the effect to the whole page, including the controls. The ambient light API used by scaredUI is not available in Safari or Chrome on iPhone. When the sensor is unavailable, choose **Use front camera**, allow camera access, and keep the camera uncovered while it calibrates. Move your hand over the camera's view to try the effect. Frames are processed locally and are not saved or sent; use **Stop camera** to stop capture. Camera exposure or scene changes may affect the response. Some Chromium browsers require an experimental flag and compatible hardware for sensor access.
 
 ## Deploy to Vercel
 

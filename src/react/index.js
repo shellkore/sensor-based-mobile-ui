@@ -8,12 +8,13 @@ import { readEarthquake, earthquakeMotion } from '../core/earthquake.js';
 import { readLoudness } from '../core/pulse.js';
 import { gravityMotion } from '../core/gravity.js';
 
-export function ScaredUI({ children, className }) {
+export function ScaredUI({ children, className, controlsAfter, animateControls = false }) {
   const [status, setStatus] = useState('idle');
   const [session, setSession] = useState(0);
   const [cameraStream, setCameraStream] = useState(null);
   const [sensorEnabled, setSensorEnabled] = useState(false);
   const elements = useRef([]);
+  const controlsRef = useRef(null);
   const video = useRef(null);
   const cameraRef = useRef(null);
   const cameraRequest = useRef(0);
@@ -77,7 +78,7 @@ export function ScaredUI({ children, className }) {
           lastSample = now;
         } catch { stopCamera(); setStatus('camera-unavailable'); return; }
       }
-      elements.current.forEach((element, index) => {
+      [...elements.current, controlsRef.current].forEach((element, index) => {
         if (!element) return;
         const { x, y, rotate, scaleY } = reducedMotion.matches ? { x: 0, y: 0, rotate: 0, scaleY: 1 } : scaredMotion(cameraState.current, now, index);
         element.style.transform = `translate(${x}px, ${y}px) rotate(${rotate}deg) scaleY(${scaleY})`;
@@ -93,6 +94,7 @@ export function ScaredUI({ children, className }) {
       if (video.current) video.current.srcObject = null;
       cancelAnimationFrame(frame);
       elements.current.forEach(element => { if (element) element.style.transform = ''; });
+      if (controlsRef.current) controlsRef.current.style.transform = '';
     };
   }, [cameraStream]);
 
@@ -111,11 +113,11 @@ export function ScaredUI({ children, className }) {
     let frame;
     let state = createScaredState();
     const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
-    const reset = () => elements.current.forEach(element => {
+    const reset = () => [...elements.current, controlsRef.current].forEach(element => {
       if (element) element.style.transform = '';
     });
     const animate = () => {
-      elements.current.forEach((element, index) => {
+      [...elements.current, controlsRef.current].forEach((element, index) => {
         if (!element) return;
         const { x, y, rotate, scaleY } = reducedMotion.matches ? { x: 0, y: 0, rotate: 0, scaleY: 1 } : scaredMotion(state, Date.now(), index);
         element.style.transform = `translate(${x}px, ${y}px) rotate(${rotate}deg) scaleY(${scaleY})`;
@@ -148,7 +150,7 @@ export function ScaredUI({ children, className }) {
     };
   }, [session, sensorEnabled]);
 
-  return React.createElement('div', { className },
+  const controls = React.createElement(animateControls ? 'div' : React.Fragment, animateControls ? { className: 'scared-controls', ref: controlsRef, key: 'controls' } : { key: 'controls' },
     cameraStream
       ? React.createElement(React.Fragment, null,
         React.createElement('button', { type: 'button', onClick: () => { cameraState.current = createScaredState(); setStatus('camera-starting'); } }, 'Recalibrate scaredUI'),
@@ -173,12 +175,15 @@ export function ScaredUI({ children, className }) {
     }[status]),
     ['starting', 'unsupported', 'unavailable', 'camera-unavailable', 'stopped'].includes(status) && React.createElement(React.Fragment, null,
       React.createElement('p', null, 'Use the front camera to estimate light changes. Video is processed on your device and is not saved or sent anywhere.'),
-      React.createElement('button', { type: 'button', onClick: startCamera }, 'Use front camera')),
-    React.createElement('video', { ref: video, autoPlay: true, muted: true, playsInline: true, 'aria-hidden': true, tabIndex: -1, style: { position: 'fixed', width: 1, height: 1, opacity: 0.01, pointerEvents: 'none', bottom: 0, left: 0 } }),
-    React.Children.map(children, (child, index) => React.createElement('div', {
+      React.createElement('button', { type: 'button', onClick: startCamera }, 'Use front camera')));
+  const items = React.Children.map(children, (child, index) => React.createElement('div', {
       ref: element => { elements.current[index] = element; },
       style: { display: 'inline-block' }
-    }, child))
+    }, child)) || [];
+  items.splice(controlsAfter == null ? 0 : controlsAfter + 1, 0, controls);
+  return React.createElement('div', { className },
+    React.createElement('video', { ref: video, autoPlay: true, muted: true, playsInline: true, 'aria-hidden': true, tabIndex: -1, style: { position: 'fixed', width: 1, height: 1, opacity: 0.01, pointerEvents: 'none', bottom: 0, left: 0 } }),
+    items
   );
 }
 
