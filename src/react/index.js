@@ -5,6 +5,7 @@ import { createScaredState, frameBrightness, readLight, scaredMotion } from '../
 import { createMagneticState, readMagneticField, readMagneticHeading, magneticMotion } from '../core/magnetic.js';
 import { readRotation, tornadoMotion } from '../core/tornado.js';
 import { readEarthquake, earthquakeMotion } from '../core/earthquake.js';
+import { gravityMotion } from '../core/gravity.js';
 
 export function ScaredUI({ children, className }) {
   const [status, setStatus] = useState('idle');
@@ -453,6 +454,84 @@ export function EarthquakeUI({ children, className }) {
     React.Children.map(children, (child, index) => React.createElement('div', {
       ref: element => { elements.current[index] = element; },
       style: { display: 'inline-block' }
+    }, child))
+  );
+}
+
+export function GravityUI({ children, className }) {
+  const [status, setStatus] = useState('idle');
+  const [session, setSession] = useState(0);
+  const elements = useRef([]);
+  const request = useRef(0);
+
+  useEffect(() => () => { request.current++; }, []);
+
+  const enable = async () => {
+    const current = ++request.current;
+    if (!window.isSecureContext) { setStatus('insecure'); return; }
+    if (!window.DeviceOrientationEvent) { setStatus('unsupported'); return; }
+    setStatus('permission');
+    try {
+      if (typeof window.DeviceOrientationEvent.requestPermission === 'function' &&
+          await window.DeviceOrientationEvent.requestPermission() !== 'granted') {
+        if (current === request.current) setStatus('denied');
+        return;
+      }
+    } catch {
+      if (current === request.current) setStatus('denied');
+      return;
+    }
+    if (current !== request.current) return;
+    setStatus('starting');
+    setSession(value => value + 1);
+  };
+
+  useEffect(() => {
+    if (!session) return;
+    const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
+    const timeout = setTimeout(() => setStatus('unavailable'), 8000);
+    const onOrientation = event => {
+      const motion = gravityMotion(event.beta, event.gamma, window.screen.orientation?.angle ?? window.orientation ?? 0);
+      if (!motion) return;
+      clearTimeout(timeout);
+      setStatus('active');
+      elements.current.forEach(element => {
+        if (element) element.style.transform = reducedMotion.matches ? '' : `translate(${motion.x}px, ${motion.y}px)`;
+      });
+    };
+    const onReducedMotion = () => {
+      elements.current.forEach(element => {
+        if (!element) return;
+        element.style.transition = reducedMotion.matches ? 'none' : 'transform 0.2s ease-out';
+        if (reducedMotion.matches) element.style.transform = '';
+      });
+    };
+    onReducedMotion();
+    window.addEventListener('deviceorientation', onOrientation);
+    reducedMotion.addEventListener('change', onReducedMotion);
+    return () => {
+      window.removeEventListener('deviceorientation', onOrientation);
+      reducedMotion.removeEventListener('change', onReducedMotion);
+      clearTimeout(timeout);
+      elements.current.forEach(element => { if (element) element.style.transform = ''; });
+    };
+  }, [session]);
+
+  return React.createElement('div', { className },
+    React.createElement('button', { type: 'button', onClick: enable, disabled: ['permission', 'starting', 'active'].includes(status) }, status === 'active' ? 'GravityUI enabled' : session ? 'Try gravityUI again' : 'Enable gravityUI'),
+    React.createElement('p', { role: 'status' }, {
+      idle: 'Enable gravityUI, then tilt your phone.',
+      permission: 'Waiting for orientation permission.',
+      starting: 'Waiting for an orientation reading.',
+      active: 'Tilt your phone to move the cards toward the lower edge.',
+      insecure: 'Orientation sensing requires HTTPS or localhost.',
+      unsupported: 'This browser does not provide device orientation.',
+      denied: 'Orientation access was denied. Check your browser settings and try again.',
+      unavailable: 'No orientation reading was received. Check your device and browser settings, then try again.'
+    }[status]),
+    React.Children.map(children, (child, index) => React.createElement('div', {
+      ref: element => { elements.current[index] = element; },
+      style: { display: 'inline-block', transition: 'transform 0.2s ease-out' }
     }, child))
   );
 }

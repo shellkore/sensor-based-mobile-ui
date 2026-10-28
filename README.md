@@ -8,7 +8,19 @@ If you like this project, please [star the repository](https://github.com/shellk
 
 ## Project status
 
-`ScaredUI`, `CompassUI`, `TornadoUI`, and `EarthquakeUI` are available for React and Next.js. React Native support is planned. The package is not published yet.
+`ScaredUI`, `CompassUI`, `TornadoUI`, `EarthquakeUI`, and `GravityUI` are available for React and Next.js. React Native support is planned. The package is not published yet.
+
+### gravityUI
+
+`GravityUI` slides its direct children toward the lower edge as the phone tilts. Hold the phone flat to return them to their original positions.
+
+```jsx
+import { GravityUI } from 'sensor-based-mobile-ui';
+
+<GravityUI><button>One</button><button>Two</button></GravityUI>
+```
+
+Tap Enable and allow orientation access if prompted. HTTPS or localhost and a device and browser providing orientation readings are required. Unsupported or denied access leaves children usable. The effect respects reduced-motion preferences. Each direct child receives an inline-block wrapper; React 18 or newer and a client component in Next.js are required.
 
 ### earthquakeUI
 

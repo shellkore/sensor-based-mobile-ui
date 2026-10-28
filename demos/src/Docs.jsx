@@ -15,6 +15,13 @@ export default function Example() {
 
 const components = [
   {
+    name: 'GravityUI', id: 'gravity-ui', demo: '/gravity',
+    description: 'Moves cards toward the lower edge as the phone tilts.',
+    requirements: 'HTTPS or localhost and a device and browser that provide orientation readings. Allow orientation access if prompted.',
+    instructions: 'Tap Enable and tilt the phone. The children slide in the direction of the tilt and return when the phone is flat.',
+    limitations: 'Orientation support and permissions vary by device, browser, and embedding settings. If no reading arrives, the component reports it and offers a retry.'
+  },
+  {
     name: 'ScaredUI', id: 'scared-ui', demo: '/scared',
     description: 'Responds to shadows using ambient light or an optional front-camera fallback.',
     requirements: 'A compatible AmbientLightSensor, or a front camera for the optional fallback, plus HTTPS or localhost and permission where required. The ambient light API is not available in Safari or Chrome on iPhone; choose the camera fallback there.',
@@ -63,7 +70,7 @@ export default function Docs() {
     <div className="docs-layout">
       <article className="docs-content">
         <section id="getting-started"><span className="docs-index">01 / GET STARTED</span><h2>Install from a local checkout</h2><p>Clone the repository, then install its local path in your React or Next.js project. React 18 or newer is required.</p><pre><code>{`git clone https://github.com/shellkore/sensor-based-mobile-ui.git\ncd your-react-app\nnpm install react /path/to/sensor-based-mobile-ui`}</code></pre><p>Replace <code>/path/to/sensor-based-mobile-ui</code> with the path to your cloned repository.</p></section>
-        <section id="usage"><span className="docs-index">02 / YOUR FIRST INTERACTION</span><h2>Wrap the things that move</h2><p>Import a component and add the elements you want to animate as direct children. In Next.js, put this example in a client component.</p><pre><code>{example}</code></pre><p>Each direct child gets a wrapper, which can affect layout. All four components accept <code>children</code> and an optional <code>className</code> applied to the outer container. They include an enable control and a status message for sensor access.</p></section>
+        <section id="usage"><span className="docs-index">02 / YOUR FIRST INTERACTION</span><h2>Wrap the things that move</h2><p>Import a component and add the elements you want to animate as direct children. In Next.js, put this example in a client component.</p><pre><code>{example}</code></pre><p>Each direct child gets a wrapper, which can affect layout. All components accept <code>children</code> and an optional <code>className</code> applied to the outer container. They include an enable control and a status message for sensor access.</p></section>
         <section id="ui-options"><span className="docs-index">03 / THE COLLECTION</span><h2>Choose an experience</h2><div className="docs-components">{components.map(({ name, id, description }) => <a className="docs-component" href={`#${id}`} key={id}><div><h3>{name}</h3><p>{description}</p></div><span aria-hidden="true">↘</span></a>)}</div></section>
         {components.map(({ name, id, demo, description, requirements, instructions, limitations }) => <section id={id} key={id}>
           <span className="docs-index">UI OPTION / {name.toUpperCase()}</span><h2>{name}</h2><p>{description}</p>

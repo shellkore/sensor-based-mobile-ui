@@ -19,6 +19,10 @@ const pages = {
     title: 'earthquakeUI | Sensor UI Lab',
     description: 'Try earthquakeUI: shake your phone to scatter interface elements and watch them slowly return.'
   },
+  '/gravity': {
+    title: 'gravityUI | Sensor UI Lab',
+    description: 'Try gravityUI: tilt your phone to slide cards toward the lower edge.'
+  },
   '/docs': {
     title: 'Documentation | Sensor UI Lab',
     description: 'Learn how to use sensor-responsive React and Next.js components from the Sensor UI Lab library.'
