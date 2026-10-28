@@ -4,6 +4,8 @@ import { readLoudness } from './pulse.js';
 
 test('loud sounds strengthen the pulse and silence lets it settle', () => {
   assert.equal(readLoudness(new Float32Array(8)), 0);
+  assert.equal(readLoudness(new Float32Array(8).fill(0.002)), 0);
+  assert.ok(readLoudness(new Float32Array(8).fill(0.008)) > 0.02);
   const quiet = readLoudness(new Float32Array(8).fill(0.04));
   const loud = readLoudness(new Float32Array(8).fill(0.5));
   assert.ok(loud > quiet && loud <= 1);
