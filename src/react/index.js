@@ -77,8 +77,8 @@ export function ScaredUI({ children, className }) {
       }
       elements.current.forEach((element, index) => {
         if (!element) return;
-        const { x, y, rotate } = reducedMotion.matches ? { x: 0, y: 0, rotate: 0 } : scaredMotion(cameraState.current, now, index);
-        element.style.transform = `translate(${x}px, ${y}px) rotate(${rotate}deg)`;
+        const { x, y, rotate, scaleY } = reducedMotion.matches ? { x: 0, y: 0, rotate: 0, scaleY: 1 } : scaredMotion(cameraState.current, now, index);
+        element.style.transform = `translate(${x}px, ${y}px) rotate(${rotate}deg) scaleY(${scaleY})`;
       });
       frame = requestAnimationFrame(animate);
     };
@@ -115,8 +115,8 @@ export function ScaredUI({ children, className }) {
     const animate = () => {
       elements.current.forEach((element, index) => {
         if (!element) return;
-        const { x, y, rotate } = reducedMotion.matches ? { x: 0, y: 0, rotate: 0 } : scaredMotion(state, Date.now(), index);
-        element.style.transform = `translate(${x}px, ${y}px) rotate(${rotate}deg)`;
+        const { x, y, rotate, scaleY } = reducedMotion.matches ? { x: 0, y: 0, rotate: 0, scaleY: 1 } : scaredMotion(state, Date.now(), index);
+        element.style.transform = `translate(${x}px, ${y}px) rotate(${rotate}deg) scaleY(${scaleY})`;
       });
       frame = requestAnimationFrame(animate);
     };

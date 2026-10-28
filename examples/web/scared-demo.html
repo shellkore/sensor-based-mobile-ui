@@ -35,7 +35,7 @@ function draw(now) {
   ];
   cards.forEach((card,i) => {
     const motion = scaredMotion(state, now, i);
-    ctx.save(); ctx.translate(card.x+card.w/2+motion.x,card.y+card.h/2+motion.y); ctx.rotate(motion.rotate*Math.PI/180);
+    ctx.save(); ctx.translate(card.x+card.w/2+motion.x,card.y+card.h/2+motion.y); ctx.rotate(motion.rotate*Math.PI/180); ctx.scale(1,motion.scaleY);
     ctx.translate(-card.w/2,-card.h/2); round(0,0,card.w,card.h,25,card.color);
     text(card.icon,24,47,30,'#57517e','700'); text(card.title,24,card.h-56,24,'#252840','700'); text(card.sub,24,card.h-25,16,'#696d85'); ctx.restore();
   });

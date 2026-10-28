@@ -39,7 +39,7 @@ Tap Enable and allow motion access if prompted. This requires HTTPS or localhost
 
 ### scaredUI
 
-`ScaredUI` wraps each direct child and moves it when a shadow falls on the device's ambient light sensor. When the sensor is unavailable, users can opt in to a front-camera fallback that estimates changes in brightness. The interface keeps shaking while the view is darker, with stronger movement as it gets darker; a faster drop also causes temporary displacement. The first reading after enabling or recalibrating is the baseline, so keep the sensor or camera uncovered until calibration finishes.
+`ScaredUI` wraps each direct child and moves it when a shadow falls on the device's ambient light sensor. When the sensor is unavailable, users can opt in to a front-camera fallback that estimates changes in brightness. The interface keeps shaking and compresses vertically while the view is darker, with a stronger effect as it gets darker; a faster drop also causes temporary displacement. The first reading after enabling or recalibrating is the baseline, so keep the sensor or camera uncovered until calibration finishes.
 
 ```jsx
 import { ScaredUI } from 'sensor-based-mobile-ui';
