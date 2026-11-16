@@ -1,0 +1,45 @@
+name: Release
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: npm-release
+  cancel-in-progress: false
+
+jobs:
+  release:
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      issues: write
+      pull-requests: write
+      id-token: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+      - name: Verify existing release tag
+        run: |
+          if ! git rev-parse -q --verify refs/tags/v0.1.0 >/dev/null || ! git merge-base --is-ancestor v0.1.0 HEAD; then
+            echo '::error::Create v0.1.0 on the commit corresponding to the published package before releasing.'
+            exit 1
+          fi
+      - run: npm test
+      - run: npm ci --prefix demos
+      - run: npm run build --prefix demos
+      - run: npm pack --dry-run
+      - name: Publish release
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: npx --yes semantic-release@25.0.9

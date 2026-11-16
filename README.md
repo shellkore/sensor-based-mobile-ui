@@ -159,7 +159,25 @@ To run or deploy the interactive demo app, see [demos/README.md](demos/README.md
 
 ## Contributing
 
-Issues and contributions are welcome. As sensor interactions and UI designs are decided, this README will document supported devices, setup, usage, and contribution checks.
+Work on a feature branch and open a pull request to `main`. The Verify workflow runs the tests, builds the demo, and checks the npm package. Merge only after the checks and review pass. Configure a GitHub branch protection rule or ruleset for `main` to require a pull request and the `test` status check; the workflow alone does not prevent direct pushes or merges.
+
+Use conventional commit messages (and a conventional pull request title when using squash merge), since semantic-release reads the commits that land on `main`:
+
+- `fix: correct motion handling` publishes a patch release.
+- `feat: add intensity control` publishes a minor release.
+- A commit containing a `BREAKING CHANGE:` footer publishes a major release.
+- `docs: ...`, `test: ...`, and `chore: ...` do not normally trigger a release.
+
+After a push or merge to `main`, the Release workflow reruns the checks and, if the commits warrant it, publishes to npm and creates a GitHub release and tag. It uses GitHub Actions trusted publishing, so no npm token is needed. The repository's `package.json` version is not committed on each release; semantic-release sets the published version based on Git tags.
+
+### One-time release setup
+
+1. In [npm package settings](https://www.npmjs.com/package/sensor-based-mobile-ui/access), configure a GitHub Actions trusted publisher for owner `shellkore`, repository `sensor-based-mobile-ui`, and workflow filename `release.yml`. Allow publishing, and leave the environment name blank. The workflow must exist on GitHub before npm can validate it.
+2. Add and push a `v0.1.0` tag on the commit corresponding to the already published npm version. The initial npm package was published from a working tree with uncommitted changes, so first verify the closest appropriate baseline in the repository; do not tag the later intensity change as already released. Semantic-release uses this tag as its release baseline. The workflow refuses to release until the tag exists in main's history.
+3. The existing intensity commit is named `Add configurable effect intensity`, so it does not itself trigger semantic-release. To include it in the next release, merge a pull request with an appropriate conventional `feat:` commit or squash title after the baseline tag. This will include all changes since the baseline.
+4. Enable GitHub Actions. GitHub automatically supplies `secrets.GITHUB_TOKEN`; do not create a repository secret with that name or add a personal access token. The Release job requests the write permissions needed to create releases and tags, plus `id-token: write` for npm trusted publishing. No `NPM_TOKEN` repository secret is needed. Configure the branch rules mentioned above. Once the trusted publisher and tag are set up, rerun the Release workflow from the Actions tab if needed.
+
+Releases are fully automatic when qualifying changes reach `main`; test changes on the pull request before merging.
 
 ## License
 
