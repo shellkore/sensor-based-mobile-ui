@@ -4,7 +4,7 @@
   "type": "module",
   "exports": { ".": "./src/react/index.js" },
   "files": ["src", "!src/**/*.test.js"],
-  "scripts": { "test": "node --test", "prepublishOnly": "npm test" },
+  "scripts": { "test": "node --test", "test:ui": "npm test --prefix acceptance", "prepublishOnly": "npm test" },
   "publishConfig": { "access": "public", "registry": "https://registry.npmjs.org/" },
   "peerDependencies": { "react": ">=18" },
   "description": "Sensor-responsive UI components for React and Next.js",

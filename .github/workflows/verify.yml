@@ -21,3 +21,8 @@ jobs:
       - run: npm ci --prefix demos
       - run: npm run build --prefix demos
       - run: npm pack --dry-run
+      - run: npm ci --prefix acceptance
+      - name: Install the current library into the acceptance app
+        run: npm install --prefix acceptance --no-save --package-lock=false --install-links .
+      - run: npx --prefix acceptance playwright install --with-deps chromium
+      - run: npm run test:ui

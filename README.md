@@ -159,6 +159,8 @@ To run or deploy the interactive demo app, see [demos/README.md](demos/README.md
 
 ## Contributing
 
+Run `npm test` for the core checks and see [acceptance/README.md](acceptance/README.md) for browser acceptance tests in a fresh React consumer app (`npm run test:ui`). Verify and Release also run these UI tests against the current checkout.
+
 Work on a feature branch and open a pull request to `main`. The Verify workflow runs the tests, builds the demo, and checks the npm package. Merge only after the checks and review pass. Configure a GitHub branch protection rule or ruleset for `main` to require a pull request and the `test` status check; the workflow alone does not prevent direct pushes or merges.
 
 Use conventional commit messages (and a conventional pull request title when using squash merge), since semantic-release reads the commits that land on `main`:
