@@ -8,7 +8,13 @@ If you like this project, please [star the repository](https://github.com/shellk
 
 ## Project status
 
-`ScaredUI`, `CompassUI`, `TornadoUI`, `EarthquakeUI`, `PulseUI`, and `GravityUI` are available for React and Next.js. React Native support is planned. The package is not published yet.
+`ScaredUI`, `CompassUI`, `TornadoUI`, `EarthquakeUI`, `PulseUI`, and `GravityUI` are available for React and Next.js. React Native support is planned.
+
+In the next npm release, all components accept an `intensity` prop to control the strength of the visual effect. The default is `1`; use `0` for no effect, `0.5` for a gentler effect, or `2` for a stronger effect. Values are clamped to the range `0`–`2`; invalid values default to `1`. Changing the prop updates the effect while it is active. Sensor permissions and reduced-motion settings still apply.
+
+```jsx
+<GravityUI intensity={0.5}><button>One</button></GravityUI>
+```
 
 ### gravityUI
 
@@ -122,14 +128,32 @@ Each platform can offer multiple UI options. Shared code should remain independe
 
 ## Getting started
 
-Clone the repository to follow development:
+Install the package in a React 18 or newer application:
+
+```bash
+npm install sensor-based-mobile-ui
+```
+
+For Next.js, import the components from a client component:
+
+```jsx
+'use client';
+
+import { GravityUI } from 'sensor-based-mobile-ui';
+
+export default function Example() {
+  return <GravityUI><button>Tilt your phone</button></GravityUI>;
+}
+```
+
+To work on the library locally, clone the repository:
 
 ```bash
 git clone https://github.com/shellkore/sensor-based-mobile-ui.git
 cd sensor-based-mobile-ui
 ```
 
-Install the package from a local checkout alongside React, then import either component as shown above. Run `npm test` to check the shared behavior. There is no build step.
+You can also install the package from a local checkout alongside React. Run `npm test` to check the shared behavior. There is no build step.
 
 To run or deploy the interactive demo app, see [demos/README.md](demos/README.md).
 

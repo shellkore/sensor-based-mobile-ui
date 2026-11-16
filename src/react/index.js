@@ -7,8 +7,11 @@ import { readRotation, tornadoMotion } from '../core/tornado.js';
 import { readEarthquake, earthquakeMotion } from '../core/earthquake.js';
 import { readLoudness } from '../core/pulse.js';
 import { gravityMotion } from '../core/gravity.js';
+import { normalizeIntensity } from '../core/intensity.js';
 
-export function ScaredUI({ children, className, controlsAfter, animateControls = false }) {
+export function ScaredUI({ children, className, controlsAfter, animateControls = false, intensity = 1 }) {
+  const intensityRef = useRef(1);
+  intensityRef.current = normalizeIntensity(intensity);
   const [status, setStatus] = useState('idle');
   const [session, setSession] = useState(0);
   const [cameraStream, setCameraStream] = useState(null);
@@ -81,7 +84,7 @@ export function ScaredUI({ children, className, controlsAfter, animateControls =
       [...elements.current, controlsRef.current].forEach((element, index) => {
         if (!element) return;
         const { x, y, rotate, scaleY } = reducedMotion.matches ? { x: 0, y: 0, rotate: 0, scaleY: 1 } : scaredMotion(cameraState.current, now, index);
-        element.style.transform = `translate(${x}px, ${y}px) rotate(${rotate}deg) scaleY(${scaleY})`;
+        element.style.transform = `translate(${x * intensityRef.current}px, ${y * intensityRef.current}px) rotate(${rotate * intensityRef.current}deg) scaleY(${1 + (scaleY - 1) * intensityRef.current})`;
       });
       frame = requestAnimationFrame(animate);
     };
@@ -120,7 +123,7 @@ export function ScaredUI({ children, className, controlsAfter, animateControls =
       [...elements.current, controlsRef.current].forEach((element, index) => {
         if (!element) return;
         const { x, y, rotate, scaleY } = reducedMotion.matches ? { x: 0, y: 0, rotate: 0, scaleY: 1 } : scaredMotion(state, Date.now(), index);
-        element.style.transform = `translate(${x}px, ${y}px) rotate(${rotate}deg) scaleY(${scaleY})`;
+        element.style.transform = `translate(${x * intensityRef.current}px, ${y * intensityRef.current}px) rotate(${rotate * intensityRef.current}deg) scaleY(${1 + (scaleY - 1) * intensityRef.current})`;
       });
       frame = requestAnimationFrame(animate);
     };
@@ -187,7 +190,9 @@ export function ScaredUI({ children, className, controlsAfter, animateControls =
   );
 }
 
-export function CompassUI({ children, className }) {
+export function CompassUI({ children, className, intensity = 1 }) {
+  const intensityRef = useRef(1);
+  intensityRef.current = normalizeIntensity(intensity);
   const [status, setStatus] = useState('idle');
   const [session, setSession] = useState(0);
   const [source, setSource] = useState(null);
@@ -237,7 +242,7 @@ export function CompassUI({ children, className }) {
     const animate = () => {
       const { x, y } = reducedMotion.matches ? { x: 0, y: 0 } : magneticMotion(state);
       elements.current.forEach(element => {
-        if (element) element.style.transform = `translate(${x}px, ${y}px)`;
+        if (element) element.style.transform = `translate(${x * intensityRef.current}px, ${y * intensityRef.current}px)`;
       });
       frame = requestAnimationFrame(animate);
     };
@@ -301,7 +306,9 @@ export function CompassUI({ children, className }) {
 
 export { CompassUI as MagneticUI };
 
-export function TornadoUI({ children, className }) {
+export function TornadoUI({ children, className, intensity = 1 }) {
+  const intensityRef = useRef(1);
+  intensityRef.current = normalizeIntensity(intensity);
   const [status, setStatus] = useState('idle');
   const [session, setSession] = useState(0);
   const elements = useRef([]);
@@ -353,7 +360,7 @@ export function TornadoUI({ children, className }) {
       items.forEach(element => {
         if (!element) return;
         const { x, y } = reducedMotion.matches ? { x: 0, y: 0 } : tornadoMotion(state, Date.now(), element.offsetLeft + element.offsetWidth / 2 - centerX, element.offsetTop + element.offsetHeight / 2 - centerY);
-        element.style.transform = `translate(${x}px, ${y}px)`;
+        element.style.transform = `translate(${x * intensityRef.current}px, ${y * intensityRef.current}px)`;
       });
       frame = requestAnimationFrame(animate);
     };
@@ -386,7 +393,9 @@ export function TornadoUI({ children, className }) {
   );
 }
 
-export function EarthquakeUI({ children, className }) {
+export function EarthquakeUI({ children, className, intensity = 1 }) {
+  const intensityRef = useRef(1);
+  intensityRef.current = normalizeIntensity(intensity);
   const [status, setStatus] = useState('idle');
   const [session, setSession] = useState(0);
   const elements = useRef([]);
@@ -431,7 +440,7 @@ export function EarthquakeUI({ children, className }) {
       elements.current.forEach((element, index) => {
         if (!element) return;
         const { x, y, rotate } = reducedMotion.matches ? { x: 0, y: 0, rotate: 0 } : earthquakeMotion(state, Date.now(), index);
-        element.style.transform = `translate(${x}px, ${y}px) rotate(${rotate}deg)`;
+        element.style.transform = `translate(${x * intensityRef.current}px, ${y * intensityRef.current}px) rotate(${rotate * intensityRef.current}deg)`;
       });
       frame = requestAnimationFrame(animate);
     };
@@ -464,7 +473,9 @@ export function EarthquakeUI({ children, className }) {
   );
 }
 
-export function PulseUI({ children, className }) {
+export function PulseUI({ children, className, intensity = 1 }) {
+  const intensityRef = useRef(1);
+  intensityRef.current = normalizeIntensity(intensity);
   const [status, setStatus] = useState('idle');
   const [stream, setStream] = useState(null);
   const elements = useRef([]);
@@ -526,8 +537,8 @@ export function PulseUI({ children, className }) {
         level = readLoudness(samples, level);
         elements.current.forEach(element => {
           if (!element) return;
-          element.style.transform = reducedMotion.matches ? '' : `scale(${1 + level * 0.08})`;
-          element.style.boxShadow = `0 0 ${level * 30}px rgba(182, 245, 91, ${level * 0.7})`;
+          element.style.transform = reducedMotion.matches ? '' : `scale(${1 + level * 0.08 * intensityRef.current})`;
+          element.style.boxShadow = `0 0 ${level * 30 * intensityRef.current}px rgba(182, 245, 91, ${Math.min(1, level * 0.7 * intensityRef.current)})`;
         });
         frame = requestAnimationFrame(animate);
       };
@@ -561,7 +572,9 @@ export function PulseUI({ children, className }) {
   );
 }
 
-export function GravityUI({ children, className }) {
+export function GravityUI({ children, className, intensity = 1 }) {
+  const intensityRef = useRef(1);
+  intensityRef.current = normalizeIntensity(intensity);
   const [status, setStatus] = useState('idle');
   const [session, setSession] = useState(0);
   const elements = useRef([]);
@@ -599,7 +612,7 @@ export function GravityUI({ children, className }) {
       clearTimeout(timeout);
       setStatus('active');
       elements.current.forEach(element => {
-        if (element) element.style.transform = reducedMotion.matches ? '' : `translate(${motion.x}px, ${motion.y}px)`;
+        if (element) element.style.transform = reducedMotion.matches ? '' : `translate(${motion.x * intensityRef.current}px, ${motion.y * intensityRef.current}px)`;
       });
     };
     const onReducedMotion = () => {

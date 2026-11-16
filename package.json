@@ -4,9 +4,12 @@
   "type": "module",
   "exports": { ".": "./src/react/index.js" },
   "files": ["src", "!src/**/*.test.js"],
-  "scripts": { "test": "node --test" },
+  "scripts": { "test": "node --test", "prepublishOnly": "npm test" },
+  "publishConfig": { "access": "public", "registry": "https://registry.npmjs.org/" },
   "peerDependencies": { "react": ">=18" },
-  "description": "UI templates and components for sensor-responsive React, Next.js, and React Native applications",
+  "description": "Sensor-responsive UI components for React and Next.js",
+  "homepage": "https://sensor-based-mobile-ui.vercel.app/",
+  "bugs": { "url": "https://github.com/shellkore/sensor-based-mobile-ui/issues" },
   "repository": {
     "type": "git",
     "url": "https://github.com/shellkore/sensor-based-mobile-ui.git"
