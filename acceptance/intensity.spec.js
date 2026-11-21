@@ -248,14 +248,13 @@ test('custom camera controls keep calibration, sensitivity, and track cleanup wo
   await page.getByLabel('Custom controls').check();
   await page.getByRole('button', { name: 'Custom camera', exact: true }).click();
   await expect(page.getByRole('status')).toHaveText('camera-active');
-  await page.evaluate(() => {
+  await page.locator('video').evaluate(video => new Promise(resolve => {
+    video.requestVideoFrameCallback(resolve);
     const context = window.cameraCanvas.getContext('2d');
     context.fillStyle = 'black';
     context.fillRect(0, 0, 32, 24);
     window.cameraTrack.requestFrame();
-  });
-  // Wait for the synthetic video frame to reach the video element before sampling it.
-  await page.locator('video').evaluate(video => new Promise(resolve => video.requestVideoFrameCallback(resolve)));
+  }));
   await page.clock.setFixedTime(new Date('2026-11-16T12:00:00.200Z'));
   await expect.poll(async () => (await effect(page))[4]).toBeCloseTo(-0.25, 3);
   await page.getByLabel('Sensitivity').selectOption('half');
