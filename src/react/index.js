@@ -9,9 +9,11 @@ import { readLoudness } from '../core/pulse.js';
 import { gravityMotion } from '../core/gravity.js';
 import { normalizeIntensity } from '../core/intensity.js';
 
-export function ScaredUI({ children, className, controlsAfter, animateControls = false, intensity = 1 }) {
+export function ScaredUI({ children, className, controlsAfter, animateControls = false, intensity = 1, sensitivity = 1, renderControls, itemClassName, itemStyle }) {
   const intensityRef = useRef(1);
   intensityRef.current = normalizeIntensity(intensity);
+  const sensitivityRef = useRef(1);
+  sensitivityRef.current = normalizeIntensity(sensitivity);
   const [status, setStatus] = useState('idle');
   const [session, setSession] = useState(0);
   const [cameraStream, setCameraStream] = useState(null);
@@ -35,6 +37,7 @@ export function ScaredUI({ children, className, controlsAfter, animateControls =
   };
 
   const startCamera = async () => {
+    if (cameraRef.current) return;
     const request = ++cameraRequest.current;
     setSensorEnabled(false);
     setStatus('camera-pending');
@@ -83,7 +86,7 @@ export function ScaredUI({ children, className, controlsAfter, animateControls =
       }
       [...elements.current, controlsRef.current].forEach((element, index) => {
         if (!element) return;
-        const { x, y, rotate, scaleY } = reducedMotion.matches ? { x: 0, y: 0, rotate: 0, scaleY: 1 } : scaredMotion(cameraState.current, now, index);
+        const { x, y, rotate, scaleY } = reducedMotion.matches ? { x: 0, y: 0, rotate: 0, scaleY: 1 } : scaredMotion(cameraState.current, now, index, sensitivityRef.current);
         element.style.transform = `translate(${x * intensityRef.current}px, ${y * intensityRef.current}px) rotate(${rotate * intensityRef.current}deg) scaleY(${1 + (scaleY - 1) * intensityRef.current})`;
       });
       frame = requestAnimationFrame(animate);
@@ -122,7 +125,7 @@ export function ScaredUI({ children, className, controlsAfter, animateControls =
     const animate = () => {
       [...elements.current, controlsRef.current].forEach((element, index) => {
         if (!element) return;
-        const { x, y, rotate, scaleY } = reducedMotion.matches ? { x: 0, y: 0, rotate: 0, scaleY: 1 } : scaredMotion(state, Date.now(), index);
+        const { x, y, rotate, scaleY } = reducedMotion.matches ? { x: 0, y: 0, rotate: 0, scaleY: 1 } : scaredMotion(state, Date.now(), index, sensitivityRef.current);
         element.style.transform = `translate(${x * intensityRef.current}px, ${y * intensityRef.current}px) rotate(${rotate * intensityRef.current}deg) scaleY(${1 + (scaleY - 1) * intensityRef.current})`;
       });
       frame = requestAnimationFrame(animate);
@@ -153,14 +156,20 @@ export function ScaredUI({ children, className, controlsAfter, animateControls =
     };
   }, [session, sensorEnabled]);
 
-  const controls = React.createElement(animateControls ? 'div' : React.Fragment, animateControls ? { className: 'scared-controls', ref: controlsRef, key: 'controls' } : { key: 'controls' },
+  const enable = () => { stopCamera(); setSensorEnabled(true); setStatus('starting'); setSession(value => value + 1); };
+  const stop = () => { setSensorEnabled(false); setSession(0); stopCamera(); };
+  const recalibrate = () => {
+    if (cameraRef.current) { cameraState.current = createScaredState(); setStatus('camera-starting'); }
+    else enable();
+  };
+  const defaultControls = React.createElement(React.Fragment, null,
     cameraStream
       ? React.createElement(React.Fragment, null,
-        React.createElement('button', { type: 'button', onClick: () => { cameraState.current = createScaredState(); setStatus('camera-starting'); } }, 'Recalibrate scaredUI'),
+        React.createElement('button', { type: 'button', onClick: recalibrate }, 'Recalibrate scaredUI'),
         React.createElement('button', { type: 'button', onClick: stopCamera }, 'Stop camera'))
       : status === 'camera-pending'
         ? React.createElement('button', { type: 'button', onClick: stopCamera }, 'Cancel camera request')
-        : React.createElement('button', { type: 'button', onClick: () => { setSensorEnabled(true); setStatus('starting'); setSession(value => value + 1); } }, status === 'active' || status === 'dark' ? 'Recalibrate scaredUI' : session ? 'Try light sensor again' : 'Enable scaredUI'),
+        : React.createElement('button', { type: 'button', onClick: enable }, status === 'active' || status === 'dark' ? 'Recalibrate scaredUI' : session ? 'Try light sensor again' : 'Enable scaredUI'),
     React.createElement('p', { role: 'status' }, {
       idle: 'Uncover the light sensor, then enable scaredUI.',
       starting: 'Keep the light sensor uncovered while calibrating. You can choose the camera if no reading arrives.',
@@ -179,9 +188,12 @@ export function ScaredUI({ children, className, controlsAfter, animateControls =
     ['starting', 'unsupported', 'unavailable', 'camera-unavailable', 'stopped'].includes(status) && React.createElement(React.Fragment, null,
       React.createElement('p', null, 'Use the front camera to estimate light changes. Video is processed on your device and is not saved or sent anywhere.'),
       React.createElement('button', { type: 'button', onClick: startCamera }, 'Use front camera')));
+  const controls = React.createElement(animateControls ? 'div' : React.Fragment, animateControls ? { className: 'scared-controls', ref: controlsRef, key: 'controls' } : { key: 'controls' },
+    renderControls ? renderControls({ status, enable, stop, disabled: status === 'camera-pending', startCamera, stopCamera, recalibrate }) : defaultControls);
   const items = React.Children.map(children, (child, index) => React.createElement('div', {
       ref: element => { elements.current[index] = element; },
-      style: { display: 'inline-block' }
+      className: itemClassName,
+      style: { display: 'inline-block', ...itemStyle }
     }, child)) || [];
   items.splice(controlsAfter == null ? 0 : controlsAfter + 1, 0, controls);
   return React.createElement('div', { className },
@@ -190,9 +202,11 @@ export function ScaredUI({ children, className, controlsAfter, animateControls =
   );
 }
 
-export function CompassUI({ children, className, intensity = 1 }) {
+export function CompassUI({ children, className, intensity = 1, sensitivity = 1, renderControls, itemClassName, itemStyle }) {
   const intensityRef = useRef(1);
   intensityRef.current = normalizeIntensity(intensity);
+  const sensitivityRef = useRef(1);
+  sensitivityRef.current = normalizeIntensity(sensitivity);
   const [status, setStatus] = useState('idle');
   const [session, setSession] = useState(0);
   const [source, setSource] = useState(null);
@@ -240,7 +254,7 @@ export function CompassUI({ children, className, intensity = 1 }) {
       if (element) element.style.transform = '';
     });
     const animate = () => {
-      const { x, y } = reducedMotion.matches ? { x: 0, y: 0 } : magneticMotion(state);
+      const { x, y } = reducedMotion.matches ? { x: 0, y: 0 } : magneticMotion(state, sensitivityRef.current);
       elements.current.forEach(element => {
         if (element) element.style.transform = `translate(${x * intensityRef.current}px, ${y * intensityRef.current}px)`;
       });
@@ -284,7 +298,13 @@ export function CompassUI({ children, className, intensity = 1 }) {
     };
   }, [session, source]);
 
-  return React.createElement('div', { className },
+  const stop = () => {
+    request.current++;
+    setSession(0);
+    setStatus('idle');
+  };
+
+  const defaultControls = React.createElement(React.Fragment, null,
     React.createElement('button', { type: 'button', onClick: enable, disabled: status === 'permission' }, session ? 'Restart compassUI' : 'Enable compassUI'),
     React.createElement('p', { role: 'status' }, {
       idle: 'Hold your phone flat in portrait, then enable compassUI.',
@@ -296,19 +316,25 @@ export function CompassUI({ children, className, intensity = 1 }) {
       unsupported: 'This browser does not provide magnetic sensing or a compass heading.',
       denied: 'Motion and orientation access was denied. Check your browser settings and try again.',
       unavailable: 'No magnetic reading was received. Check your device and browser settings, then try again.'
-    }[status]),
+    }[status]));
+
+  return React.createElement('div', { className },
+    renderControls ? renderControls({ status, enable, stop, disabled: status === 'permission' }) : defaultControls,
     React.Children.map(children, (child, index) => React.createElement('div', {
       ref: element => { elements.current[index] = element; },
-      style: { display: 'inline-block' }
+      className: itemClassName,
+      style: { display: 'inline-block', ...itemStyle }
     }, child))
   );
 }
 
 export { CompassUI as MagneticUI };
 
-export function TornadoUI({ children, className, intensity = 1 }) {
+export function TornadoUI({ children, className, intensity = 1, sensitivity = 1, renderControls, itemClassName, itemStyle }) {
   const intensityRef = useRef(1);
   intensityRef.current = normalizeIntensity(intensity);
+  const sensitivityRef = useRef(1);
+  sensitivityRef.current = normalizeIntensity(sensitivity);
   const [status, setStatus] = useState('idle');
   const [session, setSession] = useState(0);
   const elements = useRef([]);
@@ -343,7 +369,7 @@ export function TornadoUI({ children, className, intensity = 1 }) {
     const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
     const timeout = setTimeout(() => setStatus('unavailable'), 8000);
     const onMotion = event => {
-      const reading = readRotation(event.rotationRate, Date.now(), state);
+      const reading = readRotation(event.rotationRate, Date.now(), state, sensitivityRef.current);
       if (!reading) return;
       state = reading;
       clearTimeout(timeout);
@@ -359,7 +385,7 @@ export function TornadoUI({ children, className, intensity = 1 }) {
       const centerY = (top + bottom) / 2;
       items.forEach(element => {
         if (!element) return;
-        const { x, y } = reducedMotion.matches ? { x: 0, y: 0 } : tornadoMotion(state, Date.now(), element.offsetLeft + element.offsetWidth / 2 - centerX, element.offsetTop + element.offsetHeight / 2 - centerY);
+        const { x, y } = reducedMotion.matches || sensitivityRef.current === 0 ? { x: 0, y: 0 } : tornadoMotion(state, Date.now(), element.offsetLeft + element.offsetWidth / 2 - centerX, element.offsetTop + element.offsetHeight / 2 - centerY);
         element.style.transform = `translate(${x * intensityRef.current}px, ${y * intensityRef.current}px)`;
       });
       frame = requestAnimationFrame(animate);
@@ -374,7 +400,13 @@ export function TornadoUI({ children, className, intensity = 1 }) {
     };
   }, [session]);
 
-  return React.createElement('div', { className, style: { position: 'relative' } },
+  const stop = () => {
+    request.current++;
+    setSession(0);
+    setStatus('idle');
+  };
+
+  const defaultControls = React.createElement(React.Fragment, null,
     React.createElement('button', { type: 'button', disabled: status === 'permission' || status === 'active' || status === 'starting', onClick: enable }, status === 'active' ? 'TornadoUI enabled' : session ? 'Try tornadoUI again' : 'Enable tornadoUI'),
     React.createElement('p', { role: 'status' }, {
       idle: 'Enable tornadoUI, then rotate your device quickly.',
@@ -385,17 +417,23 @@ export function TornadoUI({ children, className, intensity = 1 }) {
       unsupported: 'This browser does not provide motion sensing.',
       denied: 'Motion access was denied. Check your browser settings and try again.',
       unavailable: 'No rotation reading was received. Check your device and browser settings.'
-    }[status]),
+    }[status]));
+
+  return React.createElement('div', { className, style: { position: 'relative' } },
+    renderControls ? renderControls({ status, enable, stop, disabled: ['permission', 'starting', 'active'].includes(status) }) : defaultControls,
     React.Children.map(children, (child, index) => React.createElement('div', {
       ref: element => { elements.current[index] = element; },
-      style: { display: 'inline-block' }
+      className: itemClassName,
+      style: { display: 'inline-block', ...itemStyle }
     }, child))
   );
 }
 
-export function EarthquakeUI({ children, className, intensity = 1 }) {
+export function EarthquakeUI({ children, className, intensity = 1, sensitivity = 1, renderControls, itemClassName, itemStyle }) {
   const intensityRef = useRef(1);
   intensityRef.current = normalizeIntensity(intensity);
+  const sensitivityRef = useRef(1);
+  sensitivityRef.current = normalizeIntensity(sensitivity);
   const [status, setStatus] = useState('idle');
   const [session, setSession] = useState(0);
   const elements = useRef([]);
@@ -430,7 +468,7 @@ export function EarthquakeUI({ children, className, intensity = 1 }) {
     const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
     const timeout = setTimeout(() => setStatus('unavailable'), 8000);
     const onMotion = event => {
-      const reading = readEarthquake(event.acceleration, Date.now(), state);
+      const reading = readEarthquake(event.acceleration, Date.now(), state, sensitivityRef.current);
       if (!reading) return;
       state = reading;
       clearTimeout(timeout);
@@ -439,7 +477,7 @@ export function EarthquakeUI({ children, className, intensity = 1 }) {
     const animate = () => {
       elements.current.forEach((element, index) => {
         if (!element) return;
-        const { x, y, rotate } = reducedMotion.matches ? { x: 0, y: 0, rotate: 0 } : earthquakeMotion(state, Date.now(), index);
+        const { x, y, rotate } = reducedMotion.matches || sensitivityRef.current === 0 ? { x: 0, y: 0, rotate: 0 } : earthquakeMotion(state, Date.now(), index);
         element.style.transform = `translate(${x * intensityRef.current}px, ${y * intensityRef.current}px) rotate(${rotate * intensityRef.current}deg)`;
       });
       frame = requestAnimationFrame(animate);
@@ -454,7 +492,13 @@ export function EarthquakeUI({ children, className, intensity = 1 }) {
     };
   }, [session]);
 
-  return React.createElement('div', { className, style: { position: 'relative' } },
+  const stop = () => {
+    request.current++;
+    setSession(0);
+    setStatus('idle');
+  };
+
+  const defaultControls = React.createElement(React.Fragment, null,
     React.createElement('button', { type: 'button', disabled: status === 'permission' || status === 'active' || status === 'starting', onClick: enable }, status === 'active' ? 'EarthquakeUI enabled' : session ? 'Try earthquakeUI again' : 'Enable earthquakeUI'),
     React.createElement('p', { role: 'status' }, {
       idle: 'Enable earthquakeUI, then shake your phone.',
@@ -465,17 +509,23 @@ export function EarthquakeUI({ children, className, intensity = 1 }) {
       unsupported: 'This browser does not provide motion sensing.',
       denied: 'Motion access was denied. Check your browser settings and try again.',
       unavailable: 'No acceleration reading was received. Check your device and browser settings.'
-    }[status]),
+    }[status]));
+
+  return React.createElement('div', { className, style: { position: 'relative' } },
+    renderControls ? renderControls({ status, enable, stop, disabled: ['permission', 'starting', 'active'].includes(status) }) : defaultControls,
     React.Children.map(children, (child, index) => React.createElement('div', {
       ref: element => { elements.current[index] = element; },
-      style: { display: 'inline-block' }
+      className: itemClassName,
+      style: { display: 'inline-block', ...itemStyle }
     }, child))
   );
 }
 
-export function PulseUI({ children, className, intensity = 1 }) {
+export function PulseUI({ children, className, intensity = 1, sensitivity = 1, renderControls, itemClassName, itemStyle }) {
   const intensityRef = useRef(1);
   intensityRef.current = normalizeIntensity(intensity);
+  const sensitivityRef = useRef(1);
+  sensitivityRef.current = normalizeIntensity(sensitivity);
   const [status, setStatus] = useState('idle');
   const [stream, setStream] = useState(null);
   const elements = useRef([]);
@@ -501,6 +551,7 @@ export function PulseUI({ children, className, intensity = 1 }) {
   }, []);
 
   const start = async () => {
+    if (streamRef.current || status === 'pending') return;
     const current = ++request.current;
     if (!navigator.mediaDevices?.getUserMedia || !window.AudioContext) { setStatus('unavailable'); return; }
     setStatus('pending');
@@ -534,7 +585,7 @@ export function PulseUI({ children, className, intensity = 1 }) {
       let level = 0;
       const animate = () => {
         analyser.getFloatTimeDomainData(samples);
-        level = readLoudness(samples, level);
+        level = sensitivityRef.current === 0 ? 0 : readLoudness(samples, level, sensitivityRef.current);
         elements.current.forEach(element => {
           if (!element) return;
           element.style.transform = reducedMotion.matches ? '' : `scale(${1 + level * 0.08 * intensityRef.current})`;
@@ -555,7 +606,7 @@ export function PulseUI({ children, className, intensity = 1 }) {
     };
   }, [stream]);
 
-  return React.createElement('div', { className },
+  const defaultControls = React.createElement(React.Fragment, null,
     React.createElement('button', { type: 'button', onClick: stream || status === 'pending' ? stop : start },
       stream ? 'Stop microphone' : status === 'pending' ? 'Cancel microphone request' : 'Enable pulseUI'),
     React.createElement('p', { role: 'status' }, {
@@ -564,20 +615,28 @@ export function PulseUI({ children, className, intensity = 1 }) {
       active: 'Microphone active. Sound makes the cards pulse.',
       stopped: 'Microphone stopped.',
       unavailable: 'Microphone access is unavailable or denied. Check your browser settings and try again.'
-    }[status]),
+    }[status]));
+
+  return React.createElement('div', { className },
+    renderControls ? renderControls({ status, enable: start, stop, disabled: Boolean(stream) || status === 'pending' }) : defaultControls,
     React.Children.map(children, (child, index) => React.createElement('div', {
       ref: element => { elements.current[index] = element; },
-      style: { display: 'inline-block', borderRadius: '10px' }
+      className: itemClassName,
+      style: { display: 'inline-block', borderRadius: '10px', ...itemStyle }
     }, child))
   );
 }
 
-export function GravityUI({ children, className, intensity = 1 }) {
+export function GravityUI({ children, className, intensity = 1, sensitivity = 1, renderControls, itemClassName, itemStyle }) {
   const intensityRef = useRef(1);
   intensityRef.current = normalizeIntensity(intensity);
+  const sensitivityRef = useRef(1);
+  sensitivityRef.current = normalizeIntensity(sensitivity);
   const [status, setStatus] = useState('idle');
   const [session, setSession] = useState(0);
   const elements = useRef([]);
+  const itemStyleRef = useRef(itemStyle);
+  itemStyleRef.current = itemStyle;
   const request = useRef(0);
 
   useEffect(() => () => { request.current++; }, []);
@@ -607,7 +666,7 @@ export function GravityUI({ children, className, intensity = 1 }) {
     const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
     const timeout = setTimeout(() => setStatus('unavailable'), 8000);
     const onOrientation = event => {
-      const motion = gravityMotion(event.beta, event.gamma, window.screen.orientation?.angle ?? window.orientation ?? 0);
+      const motion = gravityMotion(event.beta, event.gamma, window.screen.orientation?.angle ?? window.orientation ?? 0, sensitivityRef.current);
       if (!motion) return;
       clearTimeout(timeout);
       setStatus('active');
@@ -618,7 +677,7 @@ export function GravityUI({ children, className, intensity = 1 }) {
     const onReducedMotion = () => {
       elements.current.forEach(element => {
         if (!element) return;
-        element.style.transition = reducedMotion.matches ? 'none' : 'transform 0.2s ease-out';
+        element.style.transition = reducedMotion.matches ? 'none' : (itemStyleRef.current?.transition ?? 'transform 0.2s ease-out');
         if (reducedMotion.matches) element.style.transform = '';
       });
     };
@@ -633,7 +692,13 @@ export function GravityUI({ children, className, intensity = 1 }) {
     };
   }, [session]);
 
-  return React.createElement('div', { className },
+  const stop = () => {
+    request.current++;
+    setSession(0);
+    setStatus('idle');
+  };
+
+  const defaultControls = React.createElement(React.Fragment, null,
     React.createElement('button', { type: 'button', onClick: enable, disabled: ['permission', 'starting', 'active'].includes(status) }, status === 'active' ? 'GravityUI enabled' : session ? 'Try gravityUI again' : 'Enable gravityUI'),
     React.createElement('p', { role: 'status' }, {
       idle: 'Enable gravityUI, then tilt your phone.',
@@ -644,10 +709,14 @@ export function GravityUI({ children, className, intensity = 1 }) {
       unsupported: 'This browser does not provide device orientation.',
       denied: 'Orientation access was denied. Check your browser settings and try again.',
       unavailable: 'No orientation reading was received. Check your device and browser settings, then try again.'
-    }[status]),
+    }[status]));
+
+  return React.createElement('div', { className },
+    renderControls ? renderControls({ status, enable, stop, disabled: ['permission', 'starting', 'active'].includes(status) }) : defaultControls,
     React.Children.map(children, (child, index) => React.createElement('div', {
       ref: element => { elements.current[index] = element; },
-      style: { display: 'inline-block', transition: 'transform 0.2s ease-out' }
+      className: itemClassName,
+      style: { display: 'inline-block', transition: 'transform 0.2s ease-out', ...itemStyle }
     }, child))
   );
 }

@@ -19,10 +19,10 @@ export function readLight(state, light, time) {
   return { ...state, light, time, impulse: Math.max(state.impulse * Math.exp(-elapsed * 2), Math.min(drop / elapsed, 1)) };
 }
 
-export function scaredMotion(state, time, index) {
+export function scaredMotion(state, time, index, sensitivity = 1) {
   if (state.baseline === null || state.baseline < 1) return { x: 0, y: 0, rotate: 0, scaleY: 1 };
   const elapsed = Math.max(0, (time - state.time) / 1000);
-  const darkness = Math.max(0, Math.min(1, (state.baseline - state.light) / state.baseline));
+  const darkness = Math.max(0, Math.min(1, (state.baseline - state.light) / state.baseline * sensitivity));
   const impulse = state.impulse * Math.exp(-elapsed * 2);
   const shake = darkness * (22 + impulse * 12);
   const phase = time / 35 + index * 2.4;

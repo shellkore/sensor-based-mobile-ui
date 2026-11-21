@@ -63,6 +63,7 @@ const componentExample = name => `'use client'; // For Next.js client components
 const sections = [
   ['getting-started', 'Getting started'],
   ['usage', 'Usage'],
+  ['customization', 'Customization'],
   ['ui-options', 'UI options'],
   ['requirements', 'Devices & permissions']
 ];
@@ -72,20 +73,43 @@ export default function Docs() {
     <div className="eyebrow"><span className="pulse" /> BUILD WITH SENSOR UI</div>
     <h1>Made to <em>move.</em></h1>
     <p className="docs-lead">Bring a little more life to your interfaces with React components that respond to the world around them.</p>
-    <div className="docs-notice"><strong>Available on npm</strong><p>The intensity prop is available in the repository and will be included in the next npm release.</p></div>
+    <div className="docs-notice"><strong>Available on npm</strong><p>Intensity is available since npm 0.2.0. Custom controls, sensitivity, and wrapper styling are available in the checkout for the next release.</p></div>
     <nav className="docs-index-nav" aria-label="On this page"><span className="docs-index">ON THIS PAGE</span><div>{sections.map(([id, label], index) => <a href={`#${id}`} key={id}><span>{String(index + 1).padStart(2, '0')}</span>{label} <span aria-hidden="true">↘</span></a>)}</div></nav>
     <div className="docs-layout">
       <article className="docs-content">
         <section id="getting-started"><span className="docs-index">01 / GET STARTED</span><h2>Install the package</h2><p>Install it in your React or Next.js project. React 18 or newer is required.</p><pre><code>npm install sensor-based-mobile-ui</code></pre></section>
-        <section id="usage"><span className="docs-index">02 / YOUR FIRST INTERACTION</span><h2>Wrap the things that move</h2><p>Import a component and add the elements you want to animate as direct children. In Next.js, put this example in a client component.</p><pre><code>{example}</code></pre><p>Each direct child gets a wrapper, which can affect layout. All components accept <code>children</code> and an optional <code>className</code> applied to the outer container. They include an enable control and a status message for sensor access.</p><h3>Control intensity</h3><p>In the next npm release, every component will accept an <code>intensity</code> prop. The default is 1; use 0 to remove the visual effect, 0.5 for a gentler effect, or 2 for a stronger effect. Values are clamped from 0 to 2; invalid values use 1. Changes take effect while the component is active, and reduced-motion preferences still apply.</p><pre><code>{`<GravityUI intensity={0.5}><button>Explore</button></GravityUI>`}</code></pre></section>
-        <section id="ui-options"><span className="docs-index">03 / THE COLLECTION</span><h2>Choose an experience</h2><div className="docs-components">{components.map(({ name, id, description }) => <a className="docs-component" href={`#${id}`} key={id}><div><h3>{name}</h3><p>{description}</p></div><span aria-hidden="true">↘</span></a>)}</div></section>
+        <section id="usage"><span className="docs-index">02 / YOUR FIRST INTERACTION</span><h2>Wrap the things that move</h2><p>Import a component and add the elements you want to animate as direct children. In Next.js, put this example in a client component.</p><pre><code>{example}</code></pre><p>Each direct child gets a wrapper, which can affect layout. All components accept <code>children</code> and an optional <code>className</code> applied to the outer container. They include an enable control and a status message for sensor access.</p><h3>Control intensity</h3><p>Since npm 0.2.0, every component accepts an <code>intensity</code> prop. The default is 1; use 0 to remove the visual effect, 0.5 for a gentler effect, or 2 for a stronger effect. Values are clamped from 0 to 2; invalid values use 1. Changes take effect while the component is active, and reduced-motion preferences still apply.</p><pre><code>{`<GravityUI intensity={0.5}><button>Explore</button></GravityUI>`}</code></pre></section>
+        <section id="customization"><span className="docs-index">03 / CUSTOMIZATION</span><h2>Make the effects your own</h2>
+          <p>These additions work across all six components and the MagneticUI alias in the current checkout, ahead of the next npm release. Omitting them preserves the existing behavior.</p>
+          <h3>Sensor sensitivity</h3><p><code>sensitivity</code> defaults to 1. Finite numbers are clamped to 0-2; invalid values use 1. Zero suppresses the effect without stopping sensor access. Audio, acceleration, and rotation gain are applied before their existing thresholds and caps. Gravity amplifies the tilt response, capped at 80px before intensity. ScaredUI amplifies darkness relative to its unchanged calibrated baseline. CompassUI changes displacement gain without changing north direction.</p>
+          <p><code>intensity</code> scales the resulting visual effect. Sensitivity changes do not restart sensors: motion changes apply on the next reading, while microphone and light effects update on animation frames. Existing earthquake and tornado impulses decay naturally when sensitivity is lowered; zero suppresses them immediately. Reduced-motion preferences still take priority.</p>
+          <h3>Wrapper styles</h3><p><code>itemClassName</code> and <code>itemStyle</code> style every animated child wrapper, while <code>className</code> styles the outer container. Styles merge over the existing defaults, so you can change display, padding, background, and border radius. Animation owns transform and PulseUI's box shadow; apply independent transforms to the child instead. GravityUI honors a custom transition except when reduced motion is requested.</p>
+          <h3>Your own controls</h3><p><code>renderControls</code> receives <code>{'{ status, enable, stop, disabled }'}</code>. Return your own buttons and accessible status message, or null to hide controls. Call enable from a user action and honor disabled; keep stop available to cancel pending permission requests. Stop cancels the session and clears its animation. The default controls remain when renderControls is omitted.</p>
+          <pre><code>{`<GravityUI
+  sensitivity={1.5}
+  intensity={0.5}
+  itemClassName="sensor-card"
+  itemStyle={{ display: 'block', padding: 16 }}
+  renderControls={({ status, enable, stop, disabled }) => (
+    <div>
+      <button type="button" onClick={enable} disabled={disabled}>Enable tilt</button>
+      <button type="button" onClick={stop}>Stop tilt</button>
+      <p role="status">{status}</p>
+    </div>
+  )}
+>
+  <button>Explore</button>
+</GravityUI>`}</code></pre>
+          <p>Translate the status codes into your own messages. Common codes are idle, permission, starting, active, denied, unsupported, and unavailable. PulseUI also uses pending and stopped. Compass fallback uses compass-active. ScaredUI additionally passes startCamera, stopCamera, and recalibrate; it reports dark, stopped, and camera-pending/starting/active/dark/unavailable states. Camera use must remain an explicit user choice with a local-processing explanation. Recalibrate resets the camera baseline or restarts the light sensor. ScaredUI's controlsAfter and animateControls also apply to custom controls.</p>
+        </section>
+        <section id="ui-options"><span className="docs-index">04 / THE COLLECTION</span><h2>Choose an experience</h2><div className="docs-components">{components.map(({ name, id, description }) => <a className="docs-component" href={`#${id}`} key={id}><div><h3>{name}</h3><p>{description}</p></div><span aria-hidden="true">↘</span></a>)}</div></section>
         {components.map(({ name, id, demo, description, requirements, instructions, limitations }) => <section id={id} key={id}>
           <span className="docs-index">UI OPTION / {name.toUpperCase()}</span><h2>{name}</h2><p>{description}</p>
           <h3>Usage</h3><pre><code>{componentExample(name)}</code></pre><p>{instructions}</p>
           <h3>Sensor requirements</h3><p>{requirements}</p>
           <h3>What to know</h3><p>{limitations}</p><a className="docs-source" href={demo}>Try the {name} demo ↗</a>
         </section>)}
-        <section id="requirements"><span className="docs-index">04 / BEFORE YOU BUILD</span><h2>Devices &amp; permissions</h2><p>Sensor access requires a compatible device and browser, a secure context (HTTPS or localhost), and any required permissions. Support varies; if access is unavailable or denied, children stay usable. Effects respect reduced-motion preferences.</p><p>Camera access is optional for ScaredUI. React Native support is planned; the current components target React and Next.js on the web.</p><a className="docs-source" href="https://github.com/shellkore/sensor-based-mobile-ui">Read the full README on GitHub ↗</a></section>
+        <section id="requirements"><span className="docs-index">05 / BEFORE YOU BUILD</span><h2>Devices &amp; permissions</h2><p>Sensor access requires a compatible device and browser, a secure context (HTTPS or localhost), and any required permissions. Support varies; if access is unavailable or denied, children stay usable. Effects respect reduced-motion preferences.</p><p>Camera access is optional for ScaredUI. React Native support is planned; the current components target React and Next.js on the web.</p><a className="docs-source" href="https://github.com/shellkore/sensor-based-mobile-ui">Read the full README on GitHub ↗</a></section>
       </article>
       <aside className="docs-aside"><div className="eyebrow"><span className="dash" /> UI OPTIONS</div><p>Choose what moves you.</p><nav aria-label="UI options">{components.map(({ name, id }) => <a href={`#${id}`} key={id}>{name} <span aria-hidden="true">↘</span></a>)}</nav></aside>
     </div>

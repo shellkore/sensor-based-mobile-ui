@@ -10,11 +10,55 @@ If you like this project, please [star the repository](https://github.com/shellk
 
 `ScaredUI`, `CompassUI`, `TornadoUI`, `EarthquakeUI`, `PulseUI`, and `GravityUI` are available for React and Next.js. React Native support is planned.
 
-In the next npm release, all components accept an `intensity` prop to control the strength of the visual effect. The default is `1`; use `0` for no effect, `0.5` for a gentler effect, or `2` for a stronger effect. Values are clamped to the range `0`–`2`; invalid values default to `1`. Changing the prop updates the effect while it is active. Sensor permissions and reduced-motion settings still apply.
+All components accept an `intensity` prop to control the strength of the visual effect (available since npm `0.2.0`). The default is `1`; use `0` for no effect, `0.5` for a gentler effect, or `2` for a stronger effect. Values are clamped to the range `0`–`2`; invalid values default to `1`. Changing the prop updates the effect while it is active. Sensor permissions and reduced-motion settings still apply.
 
 ```jsx
 <GravityUI intensity={0.5}><button>One</button></GravityUI>
 ```
+
+### Shared customization options
+
+The following additions are available in this checkout and will ship in the next npm release. They work on all six components, including the `MagneticUI` alias. Omitting them keeps the existing controls, wrappers, and sensor response.
+
+| Prop | Default | Behavior |
+| --- | --- | --- |
+| `sensitivity` | `1` | Sensor response gain. Finite numbers are clamped to `0`–`2`; invalid values (including strings, `NaN`, and infinity) use `1`. `0` suppresses the effect without stopping sensor access. |
+| `renderControls` | Built-in controls | Function receiving `{ status, enable, stop, disabled }` and returning React content to replace the built-in buttons and status message. Returning `null` hides controls. |
+| `itemClassName` | None | Class applied to every direct child's animated wrapper, not the outer container or controls. |
+| `itemStyle` | Existing wrapper styles | React style object merged over each wrapper's default styles. For example, override `display`, padding, border radius, or background. |
+
+`className` continues to style the outer container. Animation owns wrapper `transform`, PulseUI's `boxShadow`, and GravityUI's transition while running; put independent transforms on your child instead. GravityUI honors an `itemStyle.transition` override unless reduced motion is requested. Avoid using wrapper styles to override reduced-motion behavior.
+
+```jsx
+<GravityUI
+  intensity={0.5}
+  sensitivity={1.5}
+  itemClassName="sensor-card"
+  itemStyle={{ display: 'block', padding: 16 }}
+  renderControls={({ status, enable, stop, disabled }) => (
+    <div>
+      <button type="button" onClick={enable} disabled={disabled}>Enable tilt</button>
+      <button type="button" onClick={stop}>Stop tilt</button>
+      <p role="status">{status}</p>
+    </div>
+  )}
+>
+  <button>Explore</button>
+</GravityUI>
+```
+
+Call `enable` from a user interaction so permission prompts remain supported. `disabled` indicates when the enable control should be disabled; keep a stop/cancel action available during permission requests. `stop` cancels pending requests, stops the current session, and clears library animation. Custom controls are responsible for accessible names, status announcements, and any translated messages. Common statuses include `idle`, `permission`, `starting`, `active`, `denied`, `unsupported`, and `unavailable`; media components also use `pending`, `stopped`, or camera-specific statuses. Compass orientation fallback reports `compass-active`.
+
+ScaredUI additionally passes `startCamera`, `stopCamera`, and `recalibrate`. Camera access remains opt-in: explain that video is processed locally without recording or upload, and call `startCamera` only from an explicit user action. `recalibrate` resets an active camera baseline or restarts light-sensor calibration. Camera statuses include `camera-pending`, `camera-starting`, `camera-active`, `camera-dark`, and `camera-unavailable`. The light sensor can report `dark`. ScaredUI's `controlsAfter` and `animateControls` also apply to custom controls.
+
+Sensitivity adjusts the sensor response before `intensity` scales the final effect:
+
+- **PulseUI, EarthquakeUI, TornadoUI:** gain is applied to loudness, acceleration, or rotation speed before the existing thresholds and caps. Higher sensitivity can activate weaker inputs; higher intensity cannot bypass a threshold.
+- **GravityUI:** tilt displacement gain increases while the sensor response stays bounded at 80px before intensity.
+- **ScaredUI:** darkness relative to the calibrated baseline is amplified, capped at full darkness. Calibration itself is unchanged, including for the camera fallback.
+- **CompassUI:** gain changes displacement while keeping the measured north direction; compass input has no activation threshold.
+
+Changes do not restart sensors or repeat permission prompts. Gravity and motion-input changes apply on the next sensor reading; microphone and light effects update on animation frames. Existing earthquake/tornado impulses keep their natural decay when sensitivity is lowered; zero sensitivity suppresses them immediately. This does not replace real-device calibration, and reduced-motion preferences still take priority.
 
 ### gravityUI
 

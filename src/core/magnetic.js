@@ -13,9 +13,9 @@ export function readMagneticHeading(state, heading) {
   return readMagneticField(state, -Math.sin(radians), Math.cos(radians));
 }
 
-export function magneticMotion(state) {
+export function magneticMotion(state, sensitivity = 1) {
   if (!state.field) return { x: 0, y: 0 };
   const { x, y } = state.field;
-  const scale = 48 / Math.hypot(x, y);
+  const scale = 48 * sensitivity / Math.hypot(x, y);
   return { x: x ? x * scale : 0, y: y ? -y * scale : 0 };
 }

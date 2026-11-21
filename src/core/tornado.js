@@ -1,8 +1,8 @@
-export function readRotation(rate, time, previous = null) {
+export function readRotation(rate, time, previous = null, sensitivity = 1) {
   if (!rate || ![rate.alpha, rate.beta, rate.gamma].some(Number.isFinite) || !Number.isFinite(time)) return null;
   const speed = Math.hypot(...[rate.alpha, rate.beta, rate.gamma].map(value => Number.isFinite(value) ? value : 0));
   const remaining = previous ? previous.intensity * Math.exp(-Math.max(0, time - previous.time) / 700) : 0;
-  return { intensity: Math.max(remaining, Math.min(1, Math.max(0, (speed - 30) / 150))), time };
+  return { intensity: Math.max(remaining, Math.min(1, Math.max(0, (speed * sensitivity - 30) / 150))), time };
 }
 
 export function tornadoMotion(state, time, x, y) {
