@@ -34,13 +34,46 @@ function Home() {
     <section className="gallery" id="experiments"><div className="section-head"><div><div className="eyebrow"><span className="dash" /> THE COLLECTION</div><h2>Pick your <em>experience.</em></h2></div><p>A growing collection of small experiments in human-device interaction.</p></div><a className="experiment-card" href="/scared"><div className="card-visual" aria-hidden="true"><div className="card-grid" /><div className="card-orb">✳</div><span className="visual-index">EXPERIMENT / 001</span><span className="visual-symbol">↗</span></div><div className="card-content"><div className="card-meta"><span>01 / AMBIENT LIGHT</span><span className="available"><span /> AVAILABLE NOW</span></div><h3>scaredUI<span>↗</span></h3><p>An interface that gets the jitters when you get a little too close.</p><div className="card-footer"><span>LIGHT-RESPONSIVE</span><span>EXPLORE EXPERIENCE &nbsp; →</span></div></div></a><a className="experiment-card magnetic-card" href="/compass"><div className="card-visual" aria-hidden="true"><div className="card-grid" /><div className="card-orb">◎</div><span className="visual-index">EXPERIMENT / 002</span><span className="visual-symbol">↗</span></div><div className="card-content"><div className="card-meta"><span>02 / COMPASS</span><span className="available"><span /> AVAILABLE NOW</span></div><h3>compassUI<span>↗</span></h3><p>An interface drawn toward magnetic north.</p><div className="card-footer"><span>HEADING-RESPONSIVE</span><span>EXPLORE EXPERIENCE &nbsp; →</span></div></div></a><a className="experiment-card magnetic-card" href="/tornado"><div className="card-visual" aria-hidden="true"><div className="card-grid" /><div className="card-orb">✳</div><span className="visual-index">EXPERIMENT / 003</span><span className="visual-symbol">↗</span></div><div className="card-content"><div className="card-meta"><span>03 / MOTION</span><span className="available"><span /> AVAILABLE NOW</span></div><h3>tornadoUI<span>↗</span></h3><p>Rotate your phone to stir up a little storm.</p><div className="card-footer"><span>MOTION-RESPONSIVE</span><span>EXPLORE EXPERIENCE &nbsp; →</span></div></div></a><a className="experiment-card magnetic-card" href="/earthquake"><div className="card-visual" aria-hidden="true"><div className="card-grid" /><div className="card-orb">↯</div><span className="visual-index">EXPERIMENT / 004</span><span className="visual-symbol">↗</span></div><div className="card-content"><div className="card-meta"><span>04 / MOTION</span><span className="available"><span /> AVAILABLE NOW</span></div><h3>earthquakeUI<span>↗</span></h3><p>Shake your phone and watch the interface quake and slowly recover.</p><div className="card-footer"><span>MOTION-RESPONSIVE</span><span>EXPLORE EXPERIENCE &nbsp; →</span></div></div></a><a className="experiment-card magnetic-card" href="/pulse"><div className="card-visual" aria-hidden="true"><div className="card-grid" /><div className="card-orb">◉</div><span className="visual-index">EXPERIMENT / 005</span><span className="visual-symbol">↗</span></div><div className="card-content"><div className="card-meta"><span>05 / MICROPHONE</span><span className="available"><span /> AVAILABLE NOW</span></div><h3>pulseUI<span>↗</span></h3><p>Sound makes the interface expand and glow.</p><div className="card-footer"><span>SOUND-RESPONSIVE</span><span>EXPLORE EXPERIENCE &nbsp; →</span></div></div></a><a className="experiment-card magnetic-card" href="/gravity"><div className="card-visual" aria-hidden="true"><div className="card-grid" /><div className="card-orb">↓</div><span className="visual-index">EXPERIMENT / 006</span><span className="visual-symbol">↗</span></div><div className="card-content"><div className="card-meta"><span>06 / ORIENTATION</span><span className="available"><span /> AVAILABLE NOW</span></div><h3>gravityUI<span>↗</span></h3><p>Tilt your phone and watch the cards slide toward the lower edge.</p><div className="card-footer"><span>TILT-RESPONSIVE</span><span>EXPLORE EXPERIENCE &nbsp; →</span></div></div></a><div className="collection-end"><span>MORE EXPERIMENTS IN THE MAKING</span><span>✳</span></div></section></main></>;
 }
 
+function renderLabControls({ status, enable, disabled, stop, startCamera, recalibrate }) {
+  return <section className="lab-controls" aria-label="Custom sensor controls">
+    <button type="button" onClick={enable} disabled={disabled}>Start sensor</button>
+    <button type="button" onClick={stop}>Stop</button>
+    {startCamera && <>
+      <p>Camera mode measures light on this device without recording or uploading video.</p>
+      <button type="button" onClick={startCamera} disabled={disabled}>Use front camera</button>
+      <button type="button" onClick={recalibrate}>Recalibrate light</button>
+    </>}
+    <p role="status">Sensor status: {status.replaceAll('-', ' ')}</p>
+  </section>;
+}
+
+function useDemoSettings() {
+  const [sensitivity, setSensitivity] = React.useState(1);
+  const [customControls, setCustomControls] = React.useState(false);
+  const [framed, setFramed] = React.useState(false);
+  const settings = <fieldset className="lab-settings">
+    <legend>Customize this experiment</legend>
+    <label>Sensitivity · {sensitivity.toFixed(1)}×
+      <input type="range" min="0" max="2" step="0.1" value={sensitivity}
+        onChange={event => setSensitivity(event.target.valueAsNumber)} />
+    </label>
+    <label><input type="checkbox" checked={customControls}
+      onChange={event => setCustomControls(event.target.checked)} /> Custom sensor controls</label>
+    <label><input type="checkbox" checked={framed}
+      onChange={event => setFramed(event.target.checked)} /> Frame item wrappers</label>
+  </fieldset>;
+  return { settings, props: { sensitivity, renderControls: customControls ? renderLabControls : undefined,
+    itemClassName: framed ? 'lab-framed' : undefined } };
+}
+
 function Scared() {
-  return <main className="scared-experience"><ScaredUI className="scared-world" controlsAfter={5} animateControls>
+  const { settings, props } = useDemoSettings();
+  return <main className="scared-experience"><ScaredUI {...props} className="scared-world" controlsAfter={5} animateControls>
     <Header />
     <a className="back-link world-back" href="/">← &nbsp; ALL EXPERIMENTS</a>
     <div className="eyebrow world-eyebrow"><span className="pulse" /> EXPERIMENT 001 <span className="eyebrow-index">/ AMBIENT LIGHT</span></div>
     <h1 className="world-title">Meet <em>scaredUI.</em></h1>
-    <p className="world-lead">A little shy, all over. Bring your hand near the light sensor or front camera and watch the whole page react.</p>
+    <div><p className="world-lead">A little shy, all over. Bring your hand near the light sensor or front camera and watch the whole page react.</p>{settings}</div>
     <section className="world-instructions"><div className="label"><span>✳</span> HOW IT WORKS</div><h2>Make it <em>nervous.</em></h2><p>Keep the sensor or camera uncovered while you enable the experience. Then cover it with your hand and watch the page shiver. Move quickly to make it scatter further.</p><p className="sensor-note">If the light sensor is unavailable, you can choose the front camera. Changing light or camera exposure can affect the response.</p></section>
     <div className="tile tile-wide"><span className="tile-icon">✳</span><span className="tile-bottom"><strong>Make some magic</strong><small>A little inspiration for today.</small></span><span className="tile-arrow">↗</span></div>
     <div className="tile tile-purple"><span className="tile-icon">✦</span><span className="tile-bottom"><strong>Daydream</strong><small>Let your mind wander</small></span></div>
@@ -59,12 +92,13 @@ const worlds = {
 };
 
 function World({ UI, number, sensor, name, title, lead, instructions, note, icon, cards, detail }) {
-  return <main className="scared-experience"><UI className="scared-world world-other">
+  const { settings, props } = useDemoSettings();
+  return <main className="scared-experience"><UI {...props} className="scared-world world-other">
     <Header />
     <a className="back-link world-back" href="/">← &nbsp; ALL EXPERIMENTS</a>
     <div className="eyebrow world-eyebrow"><span className="pulse" /> EXPERIMENT {number} <span className="eyebrow-index">/ {sensor}</span></div>
     <h1 className="world-title">Meet <em>{name}.</em></h1>
-    <p className="world-lead">{lead}</p>
+    <div><p className="world-lead">{lead}</p>{settings}</div>
     <section className="world-instructions"><div className="label"><span>✳</span> HOW IT WORKS</div><h2>{title}</h2><p>{instructions}</p><p className="sensor-note">{note}</p></section>
     <div className="tile tile-wide"><span className="tile-icon">{icon}</span><span className="tile-bottom"><strong>{cards[0]}</strong><small>{detail}</small></span><span className="tile-arrow">↗</span></div>
     <div className="tile tile-purple"><span className="tile-icon">✦</span><span className="tile-bottom"><strong>{cards[1]}</strong></span></div>
