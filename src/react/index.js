@@ -720,3 +720,4 @@ export function GravityUI({ children, className, intensity = 1, sensitivity = 1,
     }, child))
   );
 }
+export { GestureUI } from './GestureUI.js';

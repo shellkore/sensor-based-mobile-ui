@@ -1,5 +1,6 @@
 {
   "rewrites": [
+    { "source": "/gesture", "destination": "/seo/gesture.html" },
     { "source": "/scared", "destination": "/seo/scared.html" },
     { "source": "/compass", "destination": "/seo/compass.html" },
     { "source": "/tornado", "destination": "/seo/tornado.html" },

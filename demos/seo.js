@@ -7,6 +7,10 @@ const pages = {
     title: 'scaredUI | Sensor UI Lab',
     description: 'Try scaredUI: an interface that shivers in response to shadows, using your phone’s ambient light sensor or front camera.'
   },
+  '/gesture': {
+    title: 'GestureUI | Sensor UI Lab',
+    description: 'Use your camera to pinch a card, move it sideways, and release it in place.'
+  },
   '/compass': {
     title: 'compassUI | Sensor UI Lab',
     description: 'Explore compassUI, an interface that moves toward magnetic north using your phone’s compass and orientation sensors.'

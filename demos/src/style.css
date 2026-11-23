@@ -44,3 +44,10 @@
 .lab-controls button:hover { background: #334632; }
 .lab-controls button:disabled { opacity: 0.6; cursor: default; }
 .lab-controls p { margin: 0; font-size: 14px; }
+
+.gesture-page { max-width: 900px; margin: auto; padding: 40px 6%; }
+.gesture-board { margin: 24px 0; padding: 16px; border: 1px solid #ffffff30; border-radius: 12px; background: #11131d; }
+.gesture-board button { padding: 12px 18px; border: 0; border-radius: 8px; background: #b6f55b; color: #10150a; cursor: pointer; }
+.gesture-board [role=status] { font-size: 14px; }
+.gesture-card { width: 32%; padding: 3px; }
+.gesture-card .tile { height: 96px; padding: 10px; justify-content: center; }

@@ -15,6 +15,13 @@ export default function Example() {
 
 const components = [
   {
+    name: 'GestureUI', id: 'gesture-ui', demo: '/gesture',
+    description: 'Grab and move a card sideways with a pinch. Available in the current source checkout.',
+    requirements: 'A camera, HTTPS or localhost, and network access for the hand-tracking runtime and model.',
+    instructions: 'Enable hand tracking, show an open hand and aim the dot at a card. Pinch to grab it and open your fingers to leave it in place.',
+    limitations: 'Tracks one hand. Losing sight of it drops the card. Camera frames stay on the device and switching tabs stops tracking.'
+  },
+  {
     name: 'GravityUI', id: 'gravity-ui', demo: '/gravity',
     description: 'Moves cards toward the lower edge as the phone tilts.',
     requirements: 'HTTPS or localhost and a device and browser that provide orientation readings. Allow orientation access if prompted.',
@@ -78,7 +85,7 @@ export default function Docs() {
     <div className="docs-layout">
       <article className="docs-content">
         <section id="getting-started"><span className="docs-index">01 / GET STARTED</span><h2>Install the package</h2><p>Install it in your React or Next.js project. React 18 or newer is required.</p><pre><code>npm install sensor-based-mobile-ui</code></pre></section>
-        <section id="usage"><span className="docs-index">02 / YOUR FIRST INTERACTION</span><h2>Wrap the things that move</h2><p>Import a component and add the elements you want to animate as direct children. In Next.js, put this example in a client component.</p><pre><code>{example}</code></pre><p>Each direct child gets a wrapper, which can affect layout. All components accept <code>children</code> and an optional <code>className</code> applied to the outer container. They include an enable control and a status message for sensor access.</p><h3>Control intensity</h3><p>Since npm 0.2.0, every component accepts an <code>intensity</code> prop. The default is 1; use 0 to remove the visual effect, 0.5 for a gentler effect, or 2 for a stronger effect. Values are clamped from 0 to 2; invalid values use 1. Changes take effect while the component is active, and reduced-motion preferences still apply.</p><pre><code>{`<GravityUI intensity={0.5}><button>Explore</button></GravityUI>`}</code></pre></section>
+        <section id="usage"><span className="docs-index">02 / YOUR FIRST INTERACTION</span><h2>Wrap the things that move</h2><p>Import a component and add the elements you want to animate as direct children. In Next.js, put this example in a client component.</p><pre><code>{example}</code></pre><p>Each direct child gets a wrapper, which can affect layout. All components accept <code>children</code> and an optional <code>className</code> applied to the outer container. They include an enable control and a status message for sensor access.</p><h3>Control intensity</h3><p>Since npm 0.2.0, the six sensor effects accept an <code>intensity</code> prop. The default is 1; use 0 to remove the visual effect, 0.5 for a gentler effect, or 2 for a stronger effect. Values are clamped from 0 to 2; invalid values use 1. Changes take effect while the component is active, and reduced-motion preferences still apply.</p><pre><code>{`<GravityUI intensity={0.5}><button>Explore</button></GravityUI>`}</code></pre></section>
         <section id="customization"><span className="docs-index">03 / CUSTOMIZATION</span><h2>Make the effects your own</h2>
           <p>All six components and the MagneticUI alias support these props starting in 0.3.0. Omit them to keep the default controls, sensor response, and wrapper styles.</p>
           <h3>Sensor sensitivity</h3><p><code>sensitivity</code> defaults to 1. Finite numbers are clamped to 0-2; invalid values use 1. Zero suppresses the effect without stopping sensor access. Audio, acceleration, and rotation gain are applied before their existing thresholds and caps. Gravity amplifies the tilt response, capped at 80px before intensity. ScaredUI amplifies darkness relative to its unchanged calibrated baseline. CompassUI changes displacement gain without changing north direction.</p>

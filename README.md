@@ -18,6 +18,8 @@ All components accept an `intensity` prop to control the strength of the visual 
 
 ### Shared customization options
 
+The six sensor effects below use intensity and sensitivity. The new `GestureUI` interaction is available in the source checkout and has its own camera controls.
+
 Since npm version `0.3.0`, all six components and the `MagneticUI` alias support custom controls, sensor sensitivity, and wrapper styling. Omitting these props keeps the default controls, wrappers, and sensor response.
 
 | Prop | Default | Behavior |
@@ -200,6 +202,21 @@ cd sensor-based-mobile-ui
 You can also install the package from a local checkout alongside React. Run `npm test` to check the shared behavior. There is no build step.
 
 To run or deploy the interactive demo app, see [demos/README.md](demos/README.md).
+
+## GestureUI
+
+Wrap cards in `GestureUI` to move them horizontally with one hand. Enable tracking, aim the mirrored dot at a card with your fingers open, then pinch your thumb and index finger together. Move sideways and open your fingers to drop the card. Losing tracking also releases it in place.
+
+```jsx
+import { GestureUI } from 'sensor-based-mobile-ui';
+
+<GestureUI itemStyle={{ padding: 12 }}>
+  <button>Discover</button>
+  <button>Explore</button>
+</GestureUI>
+```
+
+The checkout export supports `className`, `itemClassName`, `itemStyle`, and `renderControls({ status, enable, stop, disabled })`. Leave space around the cards for dragging. A user enables the camera on HTTPS or localhost. The browser downloads the pinned MediaPipe runtime from jsDelivr and the hand model from Google Cloud Storage. Frames are processed on-device with audio disabled. Stopping, switching tabs, or unmounting releases the camera.
 
 ## Contributing
 
