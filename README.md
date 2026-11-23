@@ -18,7 +18,7 @@ All components accept an `intensity` prop to control the strength of the visual 
 
 ### Shared customization options
 
-The following additions are available in this checkout and will ship in the next npm release. They work on all six components, including the `MagneticUI` alias. Omitting them keeps the existing controls, wrappers, and sensor response.
+Since npm version `0.3.0`, all six components and the `MagneticUI` alias support custom controls, sensor sensitivity, and wrapper styling. Omitting these props keeps the default controls, wrappers, and sensor response.
 
 | Prop | Default | Behavior |
 | --- | --- | --- |
