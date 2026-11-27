@@ -10,15 +10,15 @@ If you like this project, please [star the repository](https://github.com/shellk
 
 `ScaredUI`, `CompassUI`, `TornadoUI`, `EarthquakeUI`, `PulseUI`, and `GravityUI` are available for React and Next.js. React Native support is planned.
 
-All components accept an `intensity` prop to control the strength of the visual effect (available since npm `0.2.0`). The default is `1`; use `0` for no effect, `0.5` for a gentler effect, or `2` for a stronger effect. Values are clamped to the range `0`–`2`; invalid values default to `1`. Changing the prop updates the effect while it is active. Sensor permissions and reduced-motion settings still apply.
+These six components accept an `intensity` prop to control the strength of the visual effect (available since npm `0.2.0`). The default is `1`; use `0` for no effect, `0.5` for a gentler effect, or `2` for a stronger effect. Values are clamped to the range `0`–`2`; invalid values default to `1`. Changing the prop updates the effect while it is active. Sensor permissions and reduced-motion settings still apply.
+
+Version `0.4.0` adds [GestureUI](#gestureui) for React and Next.js. Pinch to grab a card, drag it sideways, and open your fingers to drop it.
 
 ```jsx
 <GravityUI intensity={0.5}><button>One</button></GravityUI>
 ```
 
 ### Shared customization options
-
-The six sensor effects below use intensity and sensitivity. The new `GestureUI` interaction is available in the source checkout and has its own camera controls.
 
 Since npm version `0.3.0`, all six components and the `MagneticUI` alias support custom controls, sensor sensitivity, and wrapper styling. Omitting these props keeps the default controls, wrappers, and sensor response.
 
@@ -216,7 +216,7 @@ import { GestureUI } from 'sensor-based-mobile-ui';
 </GestureUI>
 ```
 
-The checkout export supports `className`, `itemClassName`, `itemStyle`, and `renderControls({ status, enable, stop, disabled })`. Leave space around the cards for dragging. A user enables the camera on HTTPS or localhost. The browser downloads the pinned MediaPipe runtime from jsDelivr and the hand model from Google Cloud Storage. Frames are processed on-device with audio disabled. Stopping, switching tabs, or unmounting releases the camera.
+`GestureUI` supports `className`, `itemClassName`, `itemStyle`, and `renderControls({ status, enable, stop, disabled })`. Leave space around the cards for dragging. A user enables the camera on HTTPS or localhost. The browser downloads the pinned MediaPipe runtime from jsDelivr and the hand model from Google Cloud Storage. Frames are processed on-device with audio disabled. Stopping, switching tabs, or unmounting releases the camera.
 
 ## Contributing
 

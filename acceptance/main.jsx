@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
 import { createRoot } from 'react-dom/client';
-import { ScaredUI, CompassUI, TornadoUI, EarthquakeUI, PulseUI, GravityUI } from 'sensor-based-mobile-ui';
+import { ScaredUI, CompassUI, TornadoUI, EarthquakeUI, PulseUI, GravityUI, GestureUI } from 'sensor-based-mobile-ui';
 
-const components = { ScaredUI, CompassUI, TornadoUI, EarthquakeUI, PulseUI, GravityUI };
+const components = { ScaredUI, CompassUI, TornadoUI, EarthquakeUI, PulseUI, GravityUI, GestureUI };
 const intensities = { default: undefined, zero: 0, half: 0.5, normal: 1, double: 2, negative: -1, excessive: 10, invalid: NaN, infinite: Infinity, string: '1' };
 
 function App() {

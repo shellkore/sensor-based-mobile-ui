@@ -16,7 +16,7 @@ export default function Example() {
 const components = [
   {
     name: 'GestureUI', id: 'gesture-ui', demo: '/gesture',
-    description: 'Grab and move a card sideways with a pinch. Available in the current source checkout.',
+    description: 'Grab and move a card sideways with a pinch. Available on npm since 0.4.0.',
     requirements: 'A camera, HTTPS or localhost, and network access for the hand-tracking runtime and model.',
     instructions: 'Enable hand tracking, show an open hand and aim the dot at a card. Pinch to grab it and open your fingers to leave it in place.',
     limitations: 'Tracks one hand. Losing sight of it drops the card. Camera frames stay on the device and switching tabs stops tracking.'
@@ -80,7 +80,7 @@ export default function Docs() {
     <div className="eyebrow"><span className="pulse" /> BUILD WITH SENSOR UI</div>
     <h1>Made to <em>move.</em></h1>
     <p className="docs-lead">Bring a little more life to your interfaces with React components that respond to the world around them.</p>
-    <div className="docs-notice"><strong>Available on npm</strong><p>Version 0.3.0 adds custom controls, sensor sensitivity, and wrapper styling. Effect intensity has been available since 0.2.0.</p></div>
+    <div className="docs-notice"><strong>Available on npm</strong><p>Version 0.4.0 adds GestureUI for camera-based pinch, drag, and drop. Version 0.3.0 introduced custom controls, sensor sensitivity, and wrapper styling. Effect intensity has been available since 0.2.0.</p></div>
     <nav className="docs-index-nav" aria-label="On this page"><span className="docs-index">ON THIS PAGE</span><div>{sections.map(([id, label], index) => <a href={`#${id}`} key={id}><span>{String(index + 1).padStart(2, '0')}</span>{label} <span aria-hidden="true">↘</span></a>)}</div></nav>
     <div className="docs-layout">
       <article className="docs-content">
